@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: mini-ticketbox-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mini_ticketbox
+      POSTGRES_USER: mini_ticketbox
+      POSTGRES_PASSWORD: mini_ticketbox
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: mini-ticketbox-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: mini-ticketbox-mailpit
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
+volumes:
+  postgres_data:

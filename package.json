@@ -1,0 +1,14 @@
+{
+  "name": "mini-ticketbox",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@11.9.0",
+  "scripts": {
+    "dev": "corepack pnpm --parallel --filter @mini-ticketbox/web --filter @mini-ticketbox/api dev",
+    "dev:web": "corepack pnpm --filter @mini-ticketbox/web dev",
+    "dev:api": "corepack pnpm --filter @mini-ticketbox/api dev",
+    "build": "corepack pnpm -r build",
+    "test": "corepack pnpm -r test",
+    "lint": "corepack pnpm -r lint"
+  }
+}
