@@ -88,6 +88,39 @@ corepack pnpm lint
 
 # Run build
 corepack pnpm build
+
+# Generate Prisma Client
+corepack pnpm db:generate
+
+# Apply database migrations
+corepack pnpm db:migrate
+
+# Seed demo event, tickets and accounts
+corepack pnpm db:seed
+
+# Reset local database and rerun migrations/seeds
+corepack pnpm db:reset
+```
+
+## Database setup
+
+Phase 1 uses Prisma with PostgreSQL. The Prisma schema and seed live in:
+
+```txt
+apps/api/prisma/schema.prisma
+apps/api/prisma/seed.ts
+```
+
+The initial migration creates users, events, ticket types, reservations, reservation items, payments and orders. The seed creates one demo concert, VIP/Standard/Economy inventory totaling exactly 500 tickets, plus demo admin and user accounts with bcrypt-hashed passwords.
+
+For a clean local setup:
+
+```bash
+cp .env.example .env
+docker compose up -d postgres
+corepack pnpm db:generate
+corepack pnpm db:migrate
+corepack pnpm db:seed
 ```
 
 ## Core booking flow

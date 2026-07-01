@@ -14,6 +14,7 @@ export enum PaymentStatus {
   PENDING = 'PENDING',
   SUCCESS = 'SUCCESS',
   FAILED = 'FAILED',
+  TIMEOUT = 'TIMEOUT',
 }
 
 export enum TicketTypeStatus {

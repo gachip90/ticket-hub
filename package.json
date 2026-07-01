@@ -8,7 +8,15 @@
     "dev:web": "corepack pnpm --filter @mini-ticketbox/web dev",
     "dev:api": "corepack pnpm --filter @mini-ticketbox/api dev",
     "build": "corepack pnpm -r build",
+    "db:generate": "corepack pnpm exec prisma generate --schema apps/api/prisma/schema.prisma",
+    "db:migrate": "corepack pnpm exec prisma migrate deploy --schema apps/api/prisma/schema.prisma",
+    "db:reset": "corepack pnpm exec prisma migrate reset --schema apps/api/prisma/schema.prisma",
+    "db:seed": "corepack pnpm --filter @mini-ticketbox/api exec ts-node prisma/seed.ts",
+    "db:studio": "corepack pnpm exec prisma studio --schema apps/api/prisma/schema.prisma",
     "test": "corepack pnpm -r test",
     "lint": "corepack pnpm -r lint"
+  },
+  "devDependencies": {
+    "prisma": "^6.19.3"
   }
 }
