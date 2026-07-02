@@ -31,15 +31,15 @@ Use this checklist as the execution order for Codex.
 
 ## Phase 2 - Auth & RBAC
 
-- [ ] Implement register API.
-- [ ] Implement login API.
-- [ ] Implement me API.
-- [ ] Add bcrypt password hashing.
-- [ ] Add JWT strategy.
-- [ ] Add AuthGuard.
-- [ ] Add RolesGuard.
-- [ ] Protect admin endpoints.
-- [ ] Add frontend login/register pages.
+- [x] Implement register API.
+- [x] Implement login API.
+- [x] Implement me API.
+- [x] Add bcrypt password hashing.
+- [x] Add JWT strategy.
+- [x] Add AuthGuard.
+- [x] Add RolesGuard.
+- [x] Protect admin endpoints.
+- [x] Add frontend login/register pages.
 
 ## Phase 3 - Reservation core
 
@@ -47,7 +47,7 @@ Use this checklist as the execution order for Codex.
 - [ ] Implement Redis Lua script for atomic hold.
 - [ ] Implement `POST /api/reservations/hold`.
 - [ ] Implement reservation expiresAt = now + 5 minutes.
-- [ ] Implement max tickets per user/event, suggested max 4.
+- [ ] Implement max tickets per user/event, suggested max 10.
 - [ ] Implement release reservation API.
 - [ ] Implement expired reservation background job.
 - [ ] Implement inventory API.

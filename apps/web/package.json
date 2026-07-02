@@ -10,16 +10,21 @@
     "test": "echo \"No web tests yet\""
   },
   "dependencies": {
+    "@ant-design/nextjs-registry": "^1.3.0",
+    "antd": "^6.5.0",
     "next": "16.2.9",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "postcss": "^8.5.16",
+    "tailwindcss": "^4.3.2",
     "typescript": "^5"
   }
 }
