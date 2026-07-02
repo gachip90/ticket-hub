@@ -26,8 +26,8 @@ Use this checklist as the execution order for Codex.
 - [ ] Create orders table/model.
 - [ ] Seed admin account.
 - [ ] Seed demo user account.
-- [ ] Seed one concert.
-- [ ] Seed VIP 50, Standard 300, Economy 150.
+- [ ] Seed 4 concert.
+- [ ] Seed VIP 50, Standard 300, Economy 150 for main concert.
 
 ## Phase 2 - Auth & RBAC
 
@@ -43,28 +43,28 @@ Use this checklist as the execution order for Codex.
 
 ## Phase 3 - Reservation core
 
-- [ ] Initialize Redis inventory from database seed.
-- [ ] Implement Redis Lua script for atomic hold.
-- [ ] Implement `POST /api/reservations/hold`.
-- [ ] Implement reservation expiresAt = now + 5 minutes.
-- [ ] Implement max tickets per user/event, suggested max 10.
-- [ ] Implement release reservation API.
-- [ ] Implement expired reservation background job.
-- [ ] Implement inventory API.
-- [ ] Add reservation unit tests.
-- [ ] Add anti-overselling concurrency test.
+- [x] Initialize Redis inventory from database seed.
+- [x] Implement Redis Lua script for atomic hold.
+- [x] Implement `POST /api/reservations/hold`.
+- [x] Implement reservation expiresAt = now + 5 minutes.
+- [x] Implement max tickets per user/event, suggested max 10.
+- [x] Implement release reservation API.
+- [x] Implement expired reservation background job.
+- [x] Implement inventory API.
+- [x] Add reservation unit tests.
+- [x] Add anti-overselling concurrency test.
 
 ## Phase 4 - Sandbox payment
 
-- [ ] Implement create sandbox payment API.
-- [ ] Implement confirm success API.
-- [ ] Implement fail API.
-- [ ] Implement timeout/expired handling.
-- [ ] Implement idempotency check.
-- [ ] Implement order creation after payment success.
-- [ ] Update inventory held/sold after payment success.
-- [ ] Release inventory after payment failed.
-- [ ] Add payment unit tests.
+- [x] Implement create sandbox payment API.
+- [x] Implement confirm success API.
+- [x] Implement fail API.
+- [x] Implement timeout/expired handling.
+- [x] Implement idempotency check.
+- [x] Implement order creation after payment success.
+- [x] Update inventory held/sold after payment success.
+- [x] Release inventory after payment failed.
+- [x] Add payment unit tests.
 
 ## Phase 5 - Frontend booking UX
 

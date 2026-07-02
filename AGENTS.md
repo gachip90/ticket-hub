@@ -1,6 +1,7 @@
 # AGENTS.md - Mini TicketBox
 
 ## Project
+
 Mini TicketBox - Hệ thống đặt vé Concert.
 
 This project is a fullstack concert ticket booking mini project. The main evaluation focus is concurrency handling, anti-overselling, high-load UX, clean code, validation, global error handling, and unit tests.
@@ -24,12 +25,12 @@ This project is a fullstack concert ticket booking mini project. The main evalua
 
 Seed exactly one concert with these ticket types:
 
-| Ticket type | Price | Quantity |
-| --- | ---: | ---: |
-| VIP | 2,000,000 VND | 50 |
-| Standard | 1,000,000 VND | 300 |
-| Economy | 500,000 VND | 150 |
-| Total | - | 500 |
+| Ticket type |         Price | Quantity |
+| ----------- | ------------: | -------: |
+| VIP         | 2,000,000 VND |       50 |
+| Standard    | 1,000,000 VND |      300 |
+| Economy     |   500,000 VND |      150 |
+| Total       |             - |      500 |
 
 ## Core invariants
 
@@ -77,7 +78,7 @@ Expired reservations must be released idempotently.
 - Frontend countdown must be based on backend `expiresAt`.
 - Other users cannot reserve held tickets.
 - Expired held tickets must be released back to inventory.
-- Suggested limit: max 4 tickets per user per event.
+- Suggested limit: max 10 tickets per user per event.
 
 Reservation statuses:
 
