@@ -7,7 +7,7 @@ import { ReservationsService } from './reservations.service';
 
 type ReservationFixture = ReturnType<typeof createHeldReservation>;
 type HoldTransactionClient = {
-  $queryRaw: () => Promise<unknown>;
+  $executeRaw: () => Promise<unknown>;
   reservationItem: {
     aggregate: jest.Mock;
   };
@@ -44,6 +44,9 @@ function createHeldReservation(status = ReservationStatus.HELD) {
     eventId: 'event-1',
     status,
     holdExpiresAt: new Date('2026-07-02T10:05:00.000Z'),
+    recipientName: 'Tien Dat Dinh',
+    recipientEmail: 'gachip9090@gmail.com',
+    recipientPhone: '0901234567',
     createdAt: new Date('2026-07-02T10:00:00.000Z'),
     updatedAt: new Date('2026-07-02T10:00:00.000Z'),
     event: {
@@ -132,7 +135,7 @@ describe('ReservationsService', () => {
         ) => Promise<ReservationFixture>,
       ) =>
         callback({
-          $queryRaw: () => Promise.resolve(undefined),
+          $executeRaw: () => Promise.resolve(undefined),
           reservationItem: {
             aggregate: jest.fn().mockResolvedValue({ _sum: { quantity: 0 } }),
           },
@@ -149,6 +152,9 @@ describe('ReservationsService', () => {
       eventId: 'event-1',
       ticketTypeId: 'ticket-1',
       quantity: 2,
+      recipientName: 'Tien Dat Dinh',
+      recipientEmail: 'gachip9090@gmail.com',
+      recipientPhone: '0901234567',
     });
 
     expect(inventoryService.holdTicketType).toHaveBeenCalledWith('ticket-1', 2);
@@ -158,6 +164,7 @@ describe('ReservationsService', () => {
       status: ReservationStatus.HELD,
       totalQuantity: 2,
       totalAmount: 4_000_000,
+      recipientEmail: 'gachip9090@gmail.com',
     });
   });
 
@@ -179,6 +186,9 @@ describe('ReservationsService', () => {
         eventId: 'event-1',
         ticketTypeId: 'ticket-1',
         quantity: 2,
+        recipientName: 'Tien Dat Dinh',
+        recipientEmail: 'gachip9090@gmail.com',
+        recipientPhone: '0901234567',
       }),
     ).rejects.toThrow('Unable to create reservation.');
 
@@ -238,7 +248,7 @@ describe('ReservationsService', () => {
         ) => Promise<ReservationFixture>,
       ) =>
         callback({
-          $queryRaw: () => Promise.resolve(undefined),
+          $executeRaw: () => Promise.resolve(undefined),
           reservationItem: {
             aggregate: jest.fn().mockResolvedValue({ _sum: { quantity: 9 } }),
           },
@@ -256,6 +266,9 @@ describe('ReservationsService', () => {
         eventId: 'event-1',
         ticketTypeId: 'ticket-1',
         quantity: 2,
+        recipientName: 'Tien Dat Dinh',
+        recipientEmail: 'gachip9090@gmail.com',
+        recipientPhone: '0901234567',
       }),
     ).rejects.toThrow('You can hold at most 10 tickets per event.');
 
@@ -292,7 +305,7 @@ describe('ReservationsService', () => {
         ) => Promise<ReservationFixture>,
       ) =>
         callback({
-          $queryRaw: () => Promise.resolve(undefined),
+          $executeRaw: () => Promise.resolve(undefined),
           reservationItem: {
             aggregate: jest.fn().mockResolvedValue({ _sum: { quantity: 0 } }),
           },
@@ -323,6 +336,9 @@ describe('ReservationsService', () => {
           eventId: 'event-1',
           ticketTypeId: 'ticket-1',
           quantity: 1,
+          recipientName: `User ${index}`,
+          recipientEmail: `user-${index}@example.com`,
+          recipientPhone: '0901234567',
         }),
       ),
     );
@@ -349,6 +365,9 @@ describe('ReservationsService', () => {
         eventId: 'event-1',
         ticketTypeId: 'ticket-1',
         quantity: 11,
+        recipientName: 'Tien Dat Dinh',
+        recipientEmail: 'gachip9090@gmail.com',
+        recipientPhone: '0901234567',
       }),
     ).rejects.toThrow('You can hold at most 10 tickets per event.');
 

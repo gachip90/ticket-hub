@@ -3,6 +3,7 @@
 import { Button, Card, Tag, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { getStoredAuthUser } from "../lib/api";
+import { resolvePublicAssetUrl } from "../lib/assets";
 import { dinhDangNgayGio, dinhDangTien } from "../lib/format";
 import type { EventSummary } from "../lib/events";
 
@@ -107,12 +108,14 @@ export function EventCard({ event }: EventCardProps) {
         >
           <div
             className="h-full w-full bg-cover bg-center transition duration-300 hover:scale-[1.03]"
-            style={{ backgroundImage: `url(${event.imageUrl})` }}
+            style={{
+              backgroundImage: `url(${resolvePublicAssetUrl(event.imageUrl)})`,
+            }}
           />
         </button>
       }
     >
-      <div className="flex min-h-[430px] flex-col gap-5 p-6">
+      <div className="flex min-h-107.5 flex-col gap-5 p-6">
         <div>
           <Tag className="mb-3 ml-0 mr-0 rounded-full border-0 bg-slate-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-600">
             {event.genreLabel}

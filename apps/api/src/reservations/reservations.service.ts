@@ -97,11 +97,7 @@ export class ReservationsService implements OnModuleInit, OnModuleDestroy {
       );
       const reservation = await this.prisma.$transaction(
         async (transaction) => {
-          await this.lockUserEventHoldWindow(
-            transaction,
-            user.id,
-            dto.eventId,
-          );
+          await this.lockUserEventHoldWindow(transaction, user.id, dto.eventId);
           await this.validateHoldLimit(
             transaction,
             user.id,
@@ -130,6 +126,9 @@ export class ReservationsService implements OnModuleInit, OnModuleDestroy {
               userId: user.id,
               eventId: dto.eventId,
               status: ReservationStatus.HELD,
+              recipientName: dto.recipientName,
+              recipientEmail: dto.recipientEmail,
+              recipientPhone: dto.recipientPhone,
               holdExpiresAt: expiresAt,
               items: {
                 create: {
@@ -351,7 +350,7 @@ export class ReservationsService implements OnModuleInit, OnModuleDestroy {
     userId: string,
     eventId: string,
   ) {
-    await transaction.$queryRaw`
+    await transaction.$executeRaw`
       SELECT pg_advisory_xact_lock(hashtext(${userId}), hashtext(${eventId}))
     `;
   }
@@ -382,6 +381,9 @@ export class ReservationsService implements OnModuleInit, OnModuleDestroy {
       eventId: reservation.eventId,
       userId: reservation.userId,
       status: reservation.status,
+      recipientName: reservation.recipientName,
+      recipientEmail: reservation.recipientEmail,
+      recipientPhone: reservation.recipientPhone,
       expiresAt: reservation.holdExpiresAt.toISOString(),
       createdAt: reservation.createdAt.toISOString(),
       updatedAt: reservation.updatedAt.toISOString(),

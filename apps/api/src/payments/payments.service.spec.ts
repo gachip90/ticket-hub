@@ -149,9 +149,7 @@ describe('PaymentsService', () => {
 
     prisma.$transaction.mockImplementation(
       async (
-        callback: (
-          transaction: PaymentTransactionClient,
-        ) => Promise<unknown>,
+        callback: (transaction: PaymentTransactionClient) => Promise<unknown>,
       ) =>
         callback(
           createTransactionClient({
@@ -233,9 +231,7 @@ describe('PaymentsService', () => {
 
     prisma.$transaction.mockImplementation(
       async (
-        callback: (
-          transaction: PaymentTransactionClient,
-        ) => Promise<unknown>,
+        callback: (transaction: PaymentTransactionClient) => Promise<unknown>,
       ) => callback(createTransactionClient({ reservation: paidReservation })),
     );
 
@@ -286,9 +282,7 @@ describe('PaymentsService', () => {
   it('rejects payment access from another user', async () => {
     prisma.$transaction.mockImplementation(
       async (
-        callback: (
-          transaction: PaymentTransactionClient,
-        ) => Promise<unknown>,
+        callback: (transaction: PaymentTransactionClient) => Promise<unknown>,
       ) =>
         callback(
           createTransactionClient({
@@ -316,9 +310,7 @@ describe('PaymentsService', () => {
 
     prisma.$transaction.mockImplementation(
       async (
-        callback: (
-          transaction: PaymentTransactionClient,
-        ) => Promise<unknown>,
+        callback: (transaction: PaymentTransactionClient) => Promise<unknown>,
       ) =>
         callback(
           createTransactionClient({
@@ -359,7 +351,9 @@ function createPaymentFixture(
   };
 }
 
-function createOrderFixture(overrides: Partial<OrderFixture> = {}): OrderFixture {
+function createOrderFixture(
+  overrides: Partial<OrderFixture> = {},
+): OrderFixture {
   return {
     id: 'order-1',
     code: 'ORD-000001',

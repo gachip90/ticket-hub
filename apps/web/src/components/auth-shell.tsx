@@ -1,5 +1,6 @@
 import { Card, Typography } from "antd";
 import type { ReactNode } from "react";
+import { resolvePublicAssetUrl } from "../lib/assets";
 import { Logo } from "./logo";
 
 type AuthShellProps = {
@@ -47,7 +48,9 @@ export function AuthShell({
           >
             <div
               className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${imageUrl})` }}
+              style={{
+                backgroundImage: `url(${resolvePublicAssetUrl(imageUrl)})`,
+              }}
             />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(15,23,42,0.48))]" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.70),transparent_32%)]" />

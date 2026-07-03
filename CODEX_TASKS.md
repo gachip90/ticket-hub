@@ -68,14 +68,14 @@ Use this checklist as the execution order for Codex.
 
 ## Phase 5 - Frontend booking UX
 
-- [ ] Event page shows ticket types and realtime inventory.
-- [ ] Booking page allows type + quantity selection.
-- [ ] Disable buttons while request is pending.
-- [ ] Show loading/error/success states.
-- [ ] Checkout page shows 5-minute countdown from server expiresAt.
-- [ ] Add sandbox payment success/fail/timeout buttons.
-- [ ] Handle expired reservation.
-- [ ] Add polling fallback if realtime disconnects.
+- [x] Event page shows ticket types and realtime inventory.
+- [x] Booking page allows type + quantity selection.
+- [x] Disable buttons while request is pending.
+- [x] Show loading/error/success states.
+- [x] Checkout page shows 5-minute countdown from server expiresAt.
+- [x] Add sandbox payment success/fail/timeout buttons.
+- [x] Handle expired reservation.
+- [x] Add polling fallback if realtime disconnects.
 
 ## Phase 6 - Realtime
 

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 type MainPageFrameProps = {
-  header: ReactNode;
+  header?: ReactNode;
   children: ReactNode;
 };
 

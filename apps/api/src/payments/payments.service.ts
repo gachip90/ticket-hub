@@ -36,37 +36,32 @@ type PaymentReservationRecord = Prisma.ReservationGetPayload<{
 type PaymentTransactionClient = Prisma.TransactionClient;
 
 type InventorySyncResult =
-  | { inventoryEventId?: undefined }
-  | { inventoryEventId: string };
+  { inventoryEventId?: undefined } | { inventoryEventId: string };
 
 type CreateSandboxPaymentResult = InventorySyncResult & {
-  payment:
-    | {
-        id: string;
-        reservationId: string;
-        status: PaymentStatus;
-        provider: PaymentProvider;
-        amount: number;
-        createdAt: string;
-        updatedAt: string;
-        paidAt: string | null;
-      }
-    | null;
+  payment: {
+    id: string;
+    reservationId: string;
+    status: PaymentStatus;
+    provider: PaymentProvider;
+    amount: number;
+    createdAt: string;
+    updatedAt: string;
+    paidAt: string | null;
+  } | null;
 };
 
 type ConfirmSandboxPaymentResult = InventorySyncResult & {
-  payment:
-    | {
-        id: string;
-        reservationId: string;
-        status: PaymentStatus;
-        provider: PaymentProvider;
-        amount: number;
-        createdAt: string;
-        updatedAt: string;
-        paidAt: string | null;
-      }
-    | null;
+  payment: {
+    id: string;
+    reservationId: string;
+    status: PaymentStatus;
+    provider: PaymentProvider;
+    amount: number;
+    createdAt: string;
+    updatedAt: string;
+    paidAt: string | null;
+  } | null;
   reservation: {
     id: string;
     status: ReservationStatus;
@@ -82,18 +77,16 @@ type ConfirmSandboxPaymentResult = InventorySyncResult & {
 };
 
 type FailSandboxPaymentResult = InventorySyncResult & {
-  payment:
-    | {
-        id: string;
-        reservationId: string;
-        status: PaymentStatus;
-        provider: PaymentProvider;
-        amount: number;
-        createdAt: string;
-        updatedAt: string;
-        paidAt: string | null;
-      }
-    | null;
+  payment: {
+    id: string;
+    reservationId: string;
+    status: PaymentStatus;
+    provider: PaymentProvider;
+    amount: number;
+    createdAt: string;
+    updatedAt: string;
+    paidAt: string | null;
+  } | null;
   reservation: {
     id: string;
     status: ReservationStatus;
@@ -168,10 +161,7 @@ export class PaymentsService {
     return result;
   }
 
-  async confirmSandboxPayment(
-    user: AuthUser,
-    dto: ConfirmSandboxPaymentDto,
-  ) {
+  async confirmSandboxPayment(user: AuthUser, dto: ConfirmSandboxPaymentDto) {
     const result = await this.prisma.$transaction(async (transaction) => {
       const reservation = await this.lockAndLoadReservation(
         transaction,
@@ -265,19 +255,20 @@ export class PaymentsService {
           },
         }));
 
-      const updatedReservation = await transaction.reservation.findUniqueOrThrow({
-        where: { id: reservation.id },
-        include: {
-          event: true,
-          items: {
-            include: {
-              ticketType: true,
+      const updatedReservation =
+        await transaction.reservation.findUniqueOrThrow({
+          where: { id: reservation.id },
+          include: {
+            event: true,
+            items: {
+              include: {
+                ticketType: true,
+              },
             },
+            payment: true,
+            order: true,
           },
-          payment: true,
-          order: true,
-        },
-      });
+        });
 
       return {
         payment: this.serializePayment(payment),
@@ -299,10 +290,7 @@ export class PaymentsService {
     return result;
   }
 
-  async failSandboxPayment(
-    user: AuthUser,
-    dto: SandboxPaymentReservationDto,
-  ) {
+  async failSandboxPayment(user: AuthUser, dto: SandboxPaymentReservationDto) {
     const result = await this.prisma.$transaction(async (transaction) => {
       const reservation = await this.lockAndLoadReservation(
         transaction,
@@ -491,7 +479,9 @@ export class PaymentsService {
     }
   }
 
-  private isExpired(reservation: Pick<PaymentReservationRecord, 'holdExpiresAt'>) {
+  private isExpired(
+    reservation: Pick<PaymentReservationRecord, 'holdExpiresAt'>,
+  ) {
     return reservation.holdExpiresAt <= new Date();
   }
 
@@ -522,7 +512,10 @@ export class PaymentsService {
   }
 
   private serializeReservation(
-    reservation: Pick<PaymentReservationRecord, 'id' | 'status' | 'holdExpiresAt'>,
+    reservation: Pick<
+      PaymentReservationRecord,
+      'id' | 'status' | 'holdExpiresAt'
+    >,
   ) {
     return {
       id: reservation.id,

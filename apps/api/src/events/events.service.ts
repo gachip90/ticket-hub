@@ -116,19 +116,15 @@ export class EventsService {
   private resolveEventImage(eventId: string) {
     const images: Record<string, string> = {
       '11111111-1111-4111-8111-111111111111':
-        'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1200&q=80',
-      '22222222-2222-4222-8222-222222222222':
-        'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=80',
+        '/dem_nhac_sac_mau_thanh_pho.avif',
+      '22222222-2222-4222-8222-222222222222': '/le_hoi_am_thanh_hoang_hon.avif',
       '33333333-3333-4333-8333-333333333333':
-        'https://images.unsplash.com/photo-1501612780327-45045538702b?auto=format&fit=crop&w=1200&q=80',
+        '/dem_acoustic_duoi_anh_trang.avif',
       '44444444-4444-4444-8444-444444444444':
-        'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80',
+        '/dai_tiec_anh_sang_cuoi_nam.avif',
     };
 
-    return (
-      images[eventId] ??
-      'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=1200&q=80'
-    );
+    return images[eventId] ?? '/su_kien_khac.avif';
   }
 }
 

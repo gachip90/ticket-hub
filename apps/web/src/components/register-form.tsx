@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { Alert, Button, Form, Input, Typography } from 'antd';
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useMemo, useState } from 'react';
-import { AuthShell } from './auth-shell';
-import { passwordRules } from '../lib/auth-validation';
-import { AuthResponse, apiPost } from '../lib/api';
+import { Alert, Button, Form, Input, Typography } from "antd";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState } from "react";
+import { AuthShell } from "./auth-shell";
+import { passwordRules } from "../lib/auth-validation";
+import { AuthResponse, apiPost } from "../lib/api";
 
 type RegisterFormValues = {
   name: string;
@@ -17,27 +17,29 @@ type RegisterFormValues = {
 export function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [isPending, setIsPending] = useState(false);
 
-  const redirectPath = searchParams.get('redirect');
+  const redirectPath = searchParams.get("redirect");
   const loginHref = useMemo(() => {
-    return redirectPath ? `/login?redirect=${encodeURIComponent(redirectPath)}` : '/login';
+    return redirectPath
+      ? `/login?redirect=${encodeURIComponent(redirectPath)}`
+      : "/login";
   }, [redirectPath]);
 
   async function onFinish(values: RegisterFormValues) {
-    setMessage('');
+    setMessage("");
     setIsPending(true);
 
     try {
-      await apiPost<AuthResponse>('/api/auth/register', {
+      await apiPost<AuthResponse>("/api/auth/register", {
         name: values.name,
         email: values.email,
         password: values.password,
       });
       router.push(loginHref);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Đăng ký thất bại.');
+      setMessage(error instanceof Error ? error.message : "Đăng ký thất bại.");
     } finally {
       setIsPending(false);
     }
@@ -47,7 +49,7 @@ export function RegisterForm() {
     <AuthShell
       title="Đăng ký"
       description="Tạo tài khoản để bắt đầu đặt vé, theo dõi lịch sử giao dịch và tiếp tục thanh toán."
-      imageUrl="https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1400&q=85"
+      imageUrl="register_background.avif"
     >
       <Form<RegisterFormValues>
         layout="vertical"
@@ -60,8 +62,8 @@ export function RegisterForm() {
           label="Họ và tên"
           name="name"
           rules={[
-            { required: true, message: 'Vui lòng nhập họ và tên.' },
-            { max: 100, message: 'Họ và tên tối đa 100 ký tự.' },
+            { required: true, message: "Vui lòng nhập họ và tên." },
+            { max: 100, message: "Họ và tên tối đa 100 ký tự." },
           ]}
         >
           <Input
@@ -77,8 +79,8 @@ export function RegisterForm() {
           label="Email"
           name="email"
           rules={[
-            { required: true, message: 'Vui lòng nhập email.' },
-            { type: 'email', message: 'Email không hợp lệ.' },
+            { required: true, message: "Vui lòng nhập email." },
+            { type: "email", message: "Email không hợp lệ." },
           ]}
         >
           <Input
@@ -100,17 +102,28 @@ export function RegisterForm() {
           />
         </Form.Item>
 
-        <Button type="primary" htmlType="submit" size="large" block loading={isPending}>
+        <Button
+          type="primary"
+          htmlType="submit"
+          size="large"
+          block
+          loading={isPending}
+        >
           Đăng ký
         </Button>
 
         {message ? (
-          <Alert className="mt-5 rounded-2xl" type="error" title={message} showIcon />
+          <Alert
+            className="mt-5 rounded-2xl"
+            type="error"
+            title={message}
+            showIcon
+          />
         ) : null}
       </Form>
 
       <Typography.Paragraph className="mb-0 mt-7 text-center text-[15px] text-slate-500">
-        Đã có tài khoản?{' '}
+        Đã có tài khoản?{" "}
         <Link className="font-extrabold text-slate-950" href={loginHref}>
           Đăng nhập
         </Link>

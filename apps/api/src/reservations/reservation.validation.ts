@@ -4,7 +4,13 @@ export type HoldReservationDto = {
   eventId: string;
   ticketTypeId: string;
   quantity: number;
+  recipientName: string;
+  recipientEmail: string;
+  recipientPhone: string;
 };
+
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const phonePattern = /^[0-9+\-\s()]{8,20}$/;
 
 function parseObject(body: unknown) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
@@ -28,6 +34,12 @@ export function parseHoldReservationDto(body: unknown): HoldReservationDto {
   const payload = parseObject(body);
   const eventId = requiredString(payload, 'eventId');
   const ticketTypeId = requiredString(payload, 'ticketTypeId');
+  const recipientName = requiredString(payload, 'recipientName');
+  const recipientEmail = requiredString(
+    payload,
+    'recipientEmail',
+  ).toLowerCase();
+  const recipientPhone = requiredString(payload, 'recipientPhone');
   const quantityValue = payload.quantity;
 
   if (
@@ -38,9 +50,24 @@ export function parseHoldReservationDto(body: unknown): HoldReservationDto {
     throw new BadRequestException('"quantity" must be a positive integer.');
   }
 
+  if (!emailPattern.test(recipientEmail)) {
+    throw new BadRequestException(
+      '"recipientEmail" must be a valid email address.',
+    );
+  }
+
+  if (!phonePattern.test(recipientPhone)) {
+    throw new BadRequestException(
+      '"recipientPhone" must be a valid phone number.',
+    );
+  }
+
   return {
     eventId,
     ticketTypeId,
     quantity: quantityValue,
+    recipientName,
+    recipientEmail,
+    recipientPhone,
   };
 }

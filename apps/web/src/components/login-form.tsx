@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { Alert, Button, Checkbox, Form, Input, Typography } from 'antd';
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useMemo, useState } from 'react';
-import { AuthShell } from './auth-shell';
-import { passwordRules } from '../lib/auth-validation';
-import { AuthResponse, apiPost, storeAuthSession } from '../lib/api';
+import { Alert, Button, Checkbox, Form, Input, Typography } from "antd";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState } from "react";
+import { AuthShell } from "./auth-shell";
+import { passwordRules } from "../lib/auth-validation";
+import { AuthResponse, apiPost, storeAuthSession } from "../lib/api";
 
 type LoginFormValues = {
   email: string;
@@ -16,29 +16,31 @@ type LoginFormValues = {
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [isPending, setIsPending] = useState(false);
 
-  const redirectPath = searchParams.get('redirect') ?? '/';
+  const redirectPath = searchParams.get("redirect") ?? "/";
   const registerHref = useMemo(() => {
-    return redirectPath === '/'
-      ? '/register'
+    return redirectPath === "/"
+      ? "/register"
       : `/register?redirect=${encodeURIComponent(redirectPath)}`;
   }, [redirectPath]);
 
   async function onFinish(values: LoginFormValues) {
-    setMessage('');
+    setMessage("");
     setIsPending(true);
 
     try {
-      const auth = await apiPost<AuthResponse>('/api/auth/login', {
+      const auth = await apiPost<AuthResponse>("/api/auth/login", {
         email: values.email,
         password: values.password,
       });
       storeAuthSession(auth);
       router.push(redirectPath);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Đăng nhập thất bại.');
+      setMessage(
+        error instanceof Error ? error.message : "Đăng nhập thất bại.",
+      );
     } finally {
       setIsPending(false);
     }
@@ -48,7 +50,7 @@ export function LoginForm() {
     <AuthShell
       title="Đăng nhập"
       description="Đăng nhập để tiếp tục khám phá sự kiện và hoàn tất hành trình đặt vé của bạn."
-      imageUrl="https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?auto=format&fit=crop&w=1400&q=85"
+      imageUrl="login_background.avif"
     >
       <Form<LoginFormValues>
         layout="vertical"
@@ -61,8 +63,8 @@ export function LoginForm() {
           label="Email"
           name="email"
           rules={[
-            { required: true, message: 'Vui lòng nhập email.' },
-            { type: 'email', message: 'Email không hợp lệ.' },
+            { required: true, message: "Vui lòng nhập email." },
+            { type: "email", message: "Email không hợp lệ." },
           ]}
         >
           <Input
@@ -88,17 +90,28 @@ export function LoginForm() {
           <Checkbox>Ghi nhớ đăng nhập</Checkbox>
         </Form.Item>
 
-        <Button type="primary" htmlType="submit" size="large" block loading={isPending}>
+        <Button
+          type="primary"
+          htmlType="submit"
+          size="large"
+          block
+          loading={isPending}
+        >
           Đăng nhập
         </Button>
 
         {message ? (
-          <Alert className="mt-5 rounded-2xl" type="error" title={message} showIcon />
+          <Alert
+            className="mt-5 rounded-2xl"
+            type="error"
+            title={message}
+            showIcon
+          />
         ) : null}
       </Form>
 
       <Typography.Paragraph className="mb-0 mt-7 text-center text-[15px] text-slate-500">
-        Chưa có tài khoản?{' '}
+        Chưa có tài khoản?{" "}
         <Link className="font-extrabold text-slate-950" href={registerHref}>
           Tạo tài khoản
         </Link>

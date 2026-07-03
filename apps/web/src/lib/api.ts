@@ -91,11 +91,12 @@ export async function apiGet<TResponse>(
 
 export async function apiPost<TResponse>(
   path: string,
-  body: Record<string, string>,
+  body: Record<string, string | number | boolean | null>,
+  options?: { withAuth?: boolean },
 ): Promise<TResponse extends object ? TResponse : never> {
   const response = await fetch(`${apiBaseUrl}${path}`, {
     method: 'POST',
-    headers: buildHeaders(),
+    headers: buildHeaders(options?.withAuth),
     body: JSON.stringify(body),
   });
 

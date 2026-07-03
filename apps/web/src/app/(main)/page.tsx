@@ -66,7 +66,7 @@ export default function HomePage() {
       </div>
 
       {isLoading ? (
-        <div className="flex min-h-[320px] items-center justify-center rounded-[28px] border border-dashed border-slate-200 bg-white/70">
+        <div className="flex min-h-80 items-center justify-center rounded-[28px] border border-dashed border-slate-200 bg-white/70">
           <Spin size="large" />
         </div>
       ) : error ? (
