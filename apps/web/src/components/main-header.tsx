@@ -4,13 +4,13 @@ import { Avatar, Button, Dropdown, Input, type MenuProps } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSyncExternalStore } from "react";
-import { Logo } from "./logo";
 import {
   clearAuthSession,
   getStoredAuthUser,
   subscribeAuthStore,
 } from "../lib/api";
 import type { AuthUser } from "../lib/api";
+import { Logo } from "./logo";
 
 type MainHeaderProps = {
   searchValue?: string;
@@ -60,6 +60,26 @@ function LogoutIcon() {
   );
 }
 
+function DashboardIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-4 w-4 text-slate-500"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M3.33333 10.8333H8.33333V16.6667H3.33333V10.8333ZM11.6667 3.33333H16.6667V9.16667H11.6667V3.33333ZM11.6667 10.8333H16.6667V16.6667H11.6667V10.8333ZM3.33333 3.33333H8.33333V7.5H3.33333V3.33333Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function layTenGoi(user: AuthUser | null) {
   if (!user) {
     return null;
@@ -95,14 +115,28 @@ export function MainHeader({
   const kyTuDaiDien = layKyTuDaiDien(nguoiDung);
 
   const menuItems: MenuProps["items"] = [
+    ...(nguoiDung?.role === "ADMIN"
+      ? [
+          {
+            key: "admin-dashboard",
+            icon: <DashboardIcon />,
+            label: <span className="pl-2">Trang quản trị</span>,
+          },
+        ]
+      : []),
     {
       key: "logout",
       icon: <LogoutIcon />,
-      label: "Đăng xuất",
+      label: <span className="pl-2">Đăng xuất</span>,
     },
   ];
 
   function xuLyMenuClick({ key }: { key: string }) {
+    if (key === "admin-dashboard") {
+      router.push("/admin/dashboard");
+      return;
+    }
+
     if (key !== "logout") {
       return;
     }

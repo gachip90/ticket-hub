@@ -82,19 +82,19 @@ Use this checklist as the execution order for Codex.
 - [x] Implement WebSocket or SSE from backend.
 - [x] Publish inventory updates after hold/release/payment.
 - [x] Subscribe in event page.
-- [ ] Subscribe in admin dashboard.
+- [x] Subscribe in admin dashboard.
 - [x] Add reconnect or fallback behavior.
 
 ## Phase 7 - Admin dashboard
 
-- [ ] Implement stats API.
-- [ ] Implement held reservations API.
-- [ ] Implement orders API.
-- [ ] Create protected admin dashboard page.
-- [ ] Show revenue, sold, held, available.
-- [ ] Show inventory by ticket type.
-- [ ] Show held reservations list.
-- [ ] Show recent orders/payments.
+- [x] Implement stats API.
+- [x] Implement held reservations API.
+- [x] Implement orders API.
+- [x] Create protected admin dashboard page.
+- [x] Show revenue, sold, held, available.
+- [x] Show inventory by ticket type.
+- [x] Show held reservations list.
+- [x] Show recent orders/payments.
 
 ## Phase 8 - Email local
 
