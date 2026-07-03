@@ -1,65 +1,107 @@
-# Mini TicketBox - Hệ thống đặt vé Concert
+# Ticket Hub - Hệ thống đặt vé Concert
 
-> Fullstack mini project mô phỏng hệ thống đặt vé concert giới hạn 500 vé, có xử lý concurrency, giữ vé 5 phút, thanh toán sandbox, email xác nhận local và admin dashboard.
+> Dự án fullstack mô phỏng hệ thống đặt vé concert giới hạn 500 vé, tập trung vào xử lý concurrency, chống overselling, giữ vé 5 phút, thanh toán sandbox, email xác nhận local, realtime inventory và admin dashboard.
 
-## Candidate
+## 1. Thông tin ứng viên
 
-- Họ tên: `<Điền họ tên của bạn>`
+- Họ tên: `<Điền họ tên>`
 - GitHub username: `<Điền GitHub username>`
 
-## Tech stack
+## 2. Tổng quan dự án
 
-- Frontend: Next.js + TypeScript
+Ticket Hub là monorepo gồm:
+
+- `apps/web`: frontend Next.js cho trang sự kiện, đặt vé, checkout, lịch sử đơn hàng và admin dashboard
+- `apps/api`: backend NestJS cho auth, reservation, payment, email, inventory và admin APIs
+- `packages/shared`: package dùng chung cho kiểu dữ liệu / enum khi cần
+- `infra/scripts`: nơi để các script hạ tầng hoặc hỗ trợ vận hành cục bộ
+
+Các trọng tâm kỹ thuật của dự án:
+
+- Chống overselling khi nhiều người đặt vé cùng lúc
+- Giữ vé an toàn trong 5 phút
+- Thanh toán sandbox có idempotency
+- Cập nhật tồn kho realtime
+- Gửi email xác nhận qua Mailpit local
+- Cung cấp admin dashboard để theo dõi doanh thu và tồn kho
+
+## 3. Tech stack
+
+- Frontend: Next.js + TypeScript + Ant Design + Tailwind CSS
 - Backend: NestJS + TypeScript
-- Database: PostgreSQL
-- Cache/Concurrency: Redis
-- Realtime: WebSocket hoặc Server-Sent Events
-- Email local: Mailpit/MailHog + Nodemailer
-- Container: Docker Compose
+- Database: PostgreSQL + Prisma
+- Cache / inventory hold: Redis
+- Email local: Nodemailer + Mailpit
+- Infra: Docker Compose
 - Test: Jest
 
-## Main features
+## 4. Kiến trúc tổng quát
 
-- User register/login để mua vé.
-- Admin login để xem dashboard.
-- 3 loại vé: VIP, Standard, Economy.
-- Tổng 500 vé.
-- Giữ vé trong 5 phút khi user chọn vé.
-- Vé đang giữ không thể bị user khác chọn.
-- Vé tự release nếu hết 5 phút chưa thanh toán.
-- Sandbox payment: success/fail/timeout.
-- Email xác nhận sau payment success qua Mailpit/MailHog.
-- Realtime inventory update.
-- Admin dashboard: sold, held, available, revenue, held reservations, orders.
-- Unit test cho logic chống overselling và payment.
+Luồng đặt vé:
 
-## Ticket inventory seed
+1. User đăng nhập
+2. User chọn loại vé và số lượng
+3. Backend hold vé trong 5 phút bằng inventory atomic
+4. Reservation được lưu vào PostgreSQL
+5. User xác nhận thanh toán sandbox
+6. Backend chuyển số lượng từ `held` sang `sold` trong transaction
+7. Backend tạo order
+8. Backend gửi email xác nhận tới Mailpit
+9. Frontend và admin dashboard nhận cập nhật tồn kho qua realtime stream
 
-| Ticket type | Price | Quantity |
+## 5. Seed dữ liệu
+
+Hệ thống seed **4 concert** để phục vụ test và demo.
+
+- Concert chính có đủ **3 loại vé**:
+  - `VIP`: 50 vé, giá `2.000.000 VND`
+  - `Standard`: 300 vé, giá `1.000.000 VND`
+  - `Economy`: 150 vé, giá `500.000 VND`
+- 3 concert còn lại là dữ liệu bổ sung để thể hiện hệ thống hỗ trợ nhiều sự kiện.
+
+Concert chính có tổng cộng đúng **500 vé**:
+
+| Loại vé | Giá | Số lượng |
 | --- | ---: | ---: |
-| VIP | 2,000,000 VND | 50 |
-| Standard | 1,000,000 VND | 300 |
-| Economy | 500,000 VND | 150 |
-| Total | - | 500 |
+| VIP | 2.000.000 VND | 50 |
+| Standard | 1.000.000 VND | 300 |
+| Economy | 500.000 VND | 150 |
+| Tổng | - | 500 |
 
-## Local setup
+## 6. Core invariants
+
+```txt
+available + held + sold = total_quantity
+sold <= total_quantity
+sold for VIP <= 50
+sold for Standard <= 300
+sold for Economy <= 150
+total sold across all types <= 500
+```
+
+## 7. Hướng dẫn chạy local
 
 ```bash
 cp .env.example .env
 corepack pnpm install
 docker compose up -d
+corepack pnpm db:generate
+corepack pnpm db:migrate
+corepack pnpm db:seed
 corepack pnpm dev
 ```
 
-Local URLs:
+## 8. Local URLs
 
 ```txt
 Frontend: http://localhost:3000
 Backend API: http://localhost:3001
-Mailpit/MailHog: http://localhost:8025
+Mailpit: http://localhost:8025
+PostgreSQL: localhost:5433
+Redis: localhost:6379
 ```
 
-## Demo accounts
+## 9. Tài khoản demo
 
 ```txt
 Admin:
@@ -71,123 +113,21 @@ User:
   password: User@123456
 ```
 
-## Common commands
+## 10. Các lệnh thường dùng
 
 ```bash
-# Start infrastructure services
 docker compose up -d
-
-# Run web and API in development mode
 corepack pnpm dev
-
-# Run tests
 corepack pnpm test
-
-# Run lint
 corepack pnpm lint
-
-# Run build
 corepack pnpm build
-
-# Generate Prisma Client
 corepack pnpm db:generate
-
-# Apply database migrations
 corepack pnpm db:migrate
-
-# Seed demo event, tickets and accounts
 corepack pnpm db:seed
-
-# Reset local database and rerun migrations/seeds
 corepack pnpm db:reset
 ```
 
-## Database setup
-
-Phase 1 uses Prisma with PostgreSQL. The Prisma schema and seed live in:
-
-```txt
-apps/api/prisma/schema.prisma
-apps/api/prisma/seed.ts
-```
-
-The initial migration creates users, events, ticket types, reservations, reservation items, payments and orders. The seed creates one demo concert, VIP/Standard/Economy inventory totaling exactly 500 tickets, plus demo admin and user accounts with bcrypt-hashed passwords.
-
-For a clean local setup:
-
-```bash
-cp .env.example .env
-docker compose up -d postgres
-corepack pnpm db:generate
-corepack pnpm db:migrate
-corepack pnpm db:seed
-```
-
-## Core booking flow
-
-```txt
-User login
-→ Select ticket type + quantity
-→ Backend creates HELD reservation for 5 minutes
-→ Available inventory decreases, held inventory increases
-→ User sees countdown
-→ User confirms sandbox payment
-→ Reservation becomes PAID
-→ Held decreases, sold increases
-→ Order is created
-→ Confirmation email is sent to local mailbox
-```
-
-## Anti-overselling strategy
-
-The system must never sell more than the inventory limit.
-
-Recommended implementation:
-
-- Use Redis Lua script for atomic hold operation.
-- Use PostgreSQL transaction/row lock for payment confirmation.
-- Use idempotency key for hold/payment requests.
-- Keep invariant:
-
-```txt
-available + held + sold = total_quantity
-sold <= total_quantity
-```
-
-The important part is that the system must not implement a naive check-then-update flow such as:
-
-```txt
-if available > 0:
-  update available = available - quantity
-```
-
-without an atomic operation, lock, or transaction.
-
-## Sandbox payment
-
-This project intentionally does not use a real payment gateway.
-
-The sandbox payment flow supports:
-
-- Success
-- Failed
-- Timeout/expired
-
-This is enough to demonstrate the system design without requiring real merchant credentials, real money transaction, public callback URLs, refunds, chargebacks or production payment risks.
-
-## Email testing
-
-This project intentionally does not send real production emails.
-
-After successful sandbox payment, the backend sends a confirmation email to local SMTP. Open:
-
-```txt
-http://localhost:8025
-```
-
-You should see the confirmation email containing order code, ticket information, total amount and payment status.
-
-## API summary
+## 11. Danh sách API
 
 ```txt
 POST /api/auth/register
@@ -207,37 +147,174 @@ GET  /api/admin/reservations/held
 GET  /api/admin/orders
 ```
 
-## Admin dashboard
-
-Admin dashboard shows:
-
-- Total revenue
-- Sold tickets
-- Held tickets
-- Available tickets
-- Inventory by ticket type
-- Held reservations
-- Recent orders/payments
-
-## Project structure
+## 12. Frontend routes
 
 ```txt
-mini-ticketbox/
-  apps/
-    web/
-    api/
-  packages/
-    shared/
-  infra/
-    scripts/
-  docker-compose.yml
-  .env.example
-  AGENTS.md
-  README.md
+/
+/login
+/register
+/events/[id]/book
+/checkout/[reservationId]
+/me/orders
+/admin/dashboard
 ```
 
-## Notes
+## 13. Cách chạy test
 
-- Payment and email are local sandbox implementations.
-- The code is structured with provider interfaces so real payment/email providers can be added later.
-- The mini project focuses on concurrency, reliability and clear UX rather than production payment operations.
+Chạy toàn bộ:
+
+```bash
+corepack pnpm test
+```
+
+Chạy các suite backend quan trọng:
+
+```bash
+corepack pnpm --filter @mini-ticketbox/api test -- reservations.service.spec.ts payments.service.spec.ts admin.service.spec.ts roles.guard.spec.ts email.service.spec.ts
+```
+
+## 14. Chiến lược chống overselling
+
+Ticket Hub không dùng flow naive kiểu:
+
+```txt
+if available > 0:
+  update available = available - quantity
+```
+
+Thay vào đó:
+
+- Inventory hold được xử lý atomic qua Redis
+- Nếu không đủ vé, backend trả `INSUFFICIENT_TICKETS`
+- Reservation chỉ được thanh toán nếu vẫn còn trạng thái `HELD` và chưa hết hạn
+- Payment success dùng PostgreSQL transaction + row lock
+- Idempotency ngăn double click / double request tạo nhiều order
+- Inventory hết hạn hoặc fail được release idempotent
+
+## 15. Giải thích hold / release
+
+- User phải đăng nhập trước khi giữ vé
+- Thời gian hold là 5 phút
+- Backend trả `expiresAt` theo server time
+- Frontend countdown dựa trên `expiresAt` từ backend
+- Vé đang hold không thể bị người dùng khác giữ tiếp
+- Hết hạn thì inventory được trả lại
+
+Reservation statuses:
+
+```txt
+HELD
+PAID
+EXPIRED
+CANCELLED
+```
+
+## 16. Giải thích sandbox payment
+
+Dự án không tích hợp cổng thanh toán thật.
+
+Sandbox payment hỗ trợ:
+
+- Tạo payment
+- Confirm success
+- Confirm fail
+- Xử lý timeout / expired reservation
+
+Payment success chỉ hợp lệ khi:
+
+- Reservation tồn tại
+- Reservation thuộc current user, trừ admin flow
+- Reservation đang ở trạng thái `HELD`
+- `expiresAt` vẫn còn hiệu lực
+- Idempotency check pass
+
+Payment statuses:
+
+```txt
+PENDING
+SUCCESS
+FAILED
+TIMEOUT
+```
+
+## 17. Local email testing với Mailpit
+
+Email confirmation được gửi qua SMTP local:
+
+```txt
+SMTP_HOST=localhost
+SMTP_PORT=1025
+SMTP_FROM=no-reply@tickethub.local
+```
+
+Sau khi sandbox payment thành công:
+
+1. Mở `http://localhost:8025`
+2. Tìm email mới trong Mailpit
+3. Kiểm tra các trường:
+   - tên concert
+   - mã đơn hàng
+   - email người đặt
+   - loại vé
+   - số lượng
+   - tổng tiền
+   - trạng thái thanh toán
+   - thời gian tạo
+   - ghi chú đây là email sandbox
+
+## 18. Admin dashboard
+
+Admin dashboard yêu cầu role `ADMIN` và hiển thị:
+
+- Tổng vé đã bán
+- Tổng vé đang giữ
+- Tổng vé còn lại
+- Tổng doanh thu
+- Inventory theo từng loại vé
+- Danh sách held reservations
+- Recent orders / payments
+
+## 19. Ảnh chụp màn hình
+
+Cấu trúc thư mục:
+
+```txt
+docs/screenshots/
+  .gitkeep
+  home.png
+  login.png
+  booking.png
+  checkout.png
+  orders.png
+  admin-dashboard.png
+  mailpit-email.png
+```
+
+Placeholder trong README:
+
+### Trang sự kiện
+![Trang sự kiện](docs/screenshots/home.png)
+
+### Trang đăng nhập
+![Trang đăng nhập](docs/screenshots/login.png)
+
+### Trang chọn vé
+![Trang chọn vé](docs/screenshots/booking.png)
+
+### Trang checkout
+![Trang checkout](docs/screenshots/checkout.png)
+
+### Lịch sử đơn hàng
+![Lịch sử đơn hàng](docs/screenshots/orders.png)
+
+### Admin dashboard
+![Admin dashboard](docs/screenshots/admin-dashboard.png)
+
+### Mailpit inbox
+![Mailpit inbox](docs/screenshots/mailpit-email.png)
+
+## 20. Ghi chú nộp bài
+
+- `.env` đã được ignore trong `.gitignore`
+- Hệ thống local dùng `docker-compose.yml` cho PostgreSQL, Redis và Mailpit
+- Code đã được verify bằng `test`, `lint`, và `build`

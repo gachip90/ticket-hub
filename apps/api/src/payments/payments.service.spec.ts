@@ -8,6 +8,7 @@ import {
   UserRole,
 } from '@prisma/client';
 import type { AuthUser } from '../auth/auth.types';
+import { EmailService } from '../email/email.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { InventoryService } from '../reservations/inventory.service';
 import { PaymentsService } from './payments.service';
@@ -60,6 +61,11 @@ function createReservationFixture(
     venue: string;
     startAt: Date;
   };
+  user: {
+    id: string;
+    email: string;
+    name: string;
+  };
   items: Array<{
     id: string;
     ticketTypeId: string;
@@ -103,6 +109,11 @@ function createReservationFixture(
       venue: 'Ho Chi Minh City',
       startAt: new Date('2099-08-01T12:00:00.000Z'),
     },
+    user: {
+      id: 'user-1',
+      email: 'user-1@example.com',
+      name: 'User user-1',
+    },
     items: [
       {
         id: 'item-1',
@@ -124,24 +135,38 @@ function createReservationFixture(
 describe('PaymentsService', () => {
   let prisma: {
     $transaction: jest.Mock;
+    reservation: {
+      findUniqueOrThrow: jest.Mock;
+    };
   };
   let inventoryService: {
     syncEventInventory: jest.Mock;
+  };
+  let emailService: {
+    sendPaymentConfirmationEmail: jest.Mock;
   };
   let service: PaymentsService;
 
   beforeEach(() => {
     prisma = {
       $transaction: jest.fn(),
+      reservation: {
+        findUniqueOrThrow: jest.fn(),
+      },
     };
 
     inventoryService = {
       syncEventInventory: jest.fn().mockResolvedValue(undefined),
     };
 
+    emailService = {
+      sendPaymentConfirmationEmail: jest.fn().mockResolvedValue(undefined),
+    };
+
     service = new PaymentsService(
       prisma as unknown as PrismaService,
       inventoryService as unknown as InventoryService,
+      emailService as unknown as EmailService,
     );
   });
 
@@ -200,6 +225,7 @@ describe('PaymentsService', () => {
         ) => Promise<unknown>,
       ) => callback(transaction),
     );
+    prisma.reservation.findUniqueOrThrow.mockResolvedValue(paidReservation);
 
     const result = await service.confirmSandboxPayment(createUser('user-1'), {
       reservationId: 'reservation-1',
@@ -214,6 +240,14 @@ describe('PaymentsService', () => {
     });
     expect(transaction.order.create).toHaveBeenCalled();
     expect(inventoryService.syncEventInventory).toHaveBeenCalledWith('event-1');
+    expect(emailService.sendPaymentConfirmationEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        concertName: 'Mini TicketBox Concert',
+        orderCode: order.code,
+        userEmail: 'user-1@example.com',
+        recipientEmail: 'user-1@example.com',
+      }),
+    );
     expect(result.alreadyProcessed).toBe(false);
     expect(result.order?.code).toBe(order.code);
     expect(result.reservation.status).toBe(ReservationStatus.PAID);
@@ -245,6 +279,7 @@ describe('PaymentsService', () => {
     expect(result.alreadyProcessed).toBe(true);
     expect(result.order?.code).toBe('ORD-000001');
     expect(inventoryService.syncEventInventory).not.toHaveBeenCalled();
+    expect(emailService.sendPaymentConfirmationEmail).not.toHaveBeenCalled();
   });
 
   it('fails a held reservation and releases its inventory', async () => {

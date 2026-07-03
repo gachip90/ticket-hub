@@ -98,22 +98,22 @@ Use this checklist as the execution order for Codex.
 
 ## Phase 8 - Email local
 
-- [ ] Add Mailpit/MailHog Docker service.
-- [ ] Add Nodemailer email provider.
-- [ ] Add confirmation email template.
-- [ ] Send email after payment success.
-- [ ] Verify email appears at `http://localhost:8025`.
-- [ ] Add email mock/unit test if practical.
+- [x] Add Mailpit/MailHog Docker service.
+- [x] Add Nodemailer email provider.
+- [x] Add confirmation email template.
+- [x] Send email after payment success.
+- [x] Verify email appears at `http://localhost:8025`.
+- [x] Add email mock/unit test if practical.
 
 ## Phase 9 - Final polish
 
-- [ ] Run tests.
-- [ ] Run lint.
-- [ ] Run build.
+- [x] Run tests.
+- [x] Run lint.
+- [x] Run build.
 - [ ] Verify Docker setup from clean state.
-- [ ] Update README final.
-- [ ] Explain anti-overselling strategy in README.
-- [ ] Explain sandbox payment and local email in README.
+- [x] Update README final.
+- [x] Explain anti-overselling strategy in README.
+- [x] Explain sandbox payment and local email in README.
 - [ ] Add screenshots if time allows.
-- [ ] Confirm no `.env` or secrets committed.
+- [x] Confirm no `.env` or secrets committed.
 - [ ] Confirm GitHub repo ready for submission.

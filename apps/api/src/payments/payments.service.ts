@@ -2,6 +2,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import {
@@ -13,6 +14,7 @@ import {
 } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import type { AuthUser } from '../auth/auth.types';
+import { EmailService } from '../email/email.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { InventoryService } from '../reservations/inventory.service';
 import {
@@ -23,6 +25,7 @@ import {
 type PaymentReservationRecord = Prisma.ReservationGetPayload<{
   include: {
     event: true;
+    user: true;
     items: {
       include: {
         ticketType: true;
@@ -37,9 +40,12 @@ type PaymentTransactionClient = Prisma.TransactionClient;
 
 @Injectable()
 export class PaymentsService {
+  private readonly logger = new Logger(PaymentsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly inventoryService: InventoryService,
+    private readonly emailService: EmailService,
   ) {}
 
   async createSandboxPayment(
@@ -201,6 +207,7 @@ export class PaymentsService {
           where: { id: reservation.id },
           include: {
             event: true,
+            user: true,
             items: {
               include: {
                 ticketType: true,
@@ -226,6 +233,22 @@ export class PaymentsService {
 
     if (result.reservation.status === ReservationStatus.EXPIRED) {
       throw new ConflictException('Reservation has expired.');
+    }
+
+    const { order, payment } = result;
+
+    if (!result.alreadyProcessed && order && payment) {
+      await this.sendConfirmationEmail({
+        payment,
+        reservation: result.reservation,
+        order,
+      }).catch((error: unknown) => {
+        const message =
+          error instanceof Error ? error.message : 'Unknown email error';
+        this.logger.warn(
+          `Payment confirmed for reservation ${result.reservation.id}, but confirmation email failed: ${message}`,
+        );
+      });
     }
 
     return result;
@@ -338,6 +361,7 @@ export class PaymentsService {
       where: { id: reservationId },
       include: {
         event: true,
+        user: true,
         items: {
           include: {
             ticketType: true,
@@ -480,5 +504,42 @@ export class PaymentsService {
 
   private generateOrderCode() {
     return `ORD-${randomUUID().replace(/-/g, '').slice(0, 12).toUpperCase()}`;
+  }
+
+  private async sendConfirmationEmail(result: {
+    payment: NonNullable<ReturnType<PaymentsService['serializePayment']>>;
+    reservation: ReturnType<PaymentsService['serializeReservation']>;
+    order: NonNullable<ReturnType<PaymentsService['serializeOrder']>>;
+  }) {
+    const reservation = await this.prisma.reservation.findUniqueOrThrow({
+      where: { id: result.reservation.id },
+      include: {
+        event: true,
+        user: true,
+        items: {
+          include: {
+            ticketType: true,
+          },
+        },
+      },
+    });
+
+    await this.emailService.sendPaymentConfirmationEmail({
+      concertName: reservation.event.name,
+      orderCode: result.order.code,
+      userEmail: reservation.user.email,
+      recipientEmail:
+        reservation.recipientEmail?.trim() || reservation.user.email,
+      recipientName: reservation.recipientName?.trim() || reservation.user.name,
+      paymentStatus: result.payment.status,
+      totalAmount: result.order.totalAmount,
+      createdAt: result.order.createdAt,
+      items: reservation.items.map((item) => ({
+        ticketTypeName: item.ticketType.name,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        lineTotal: item.quantity * item.unitPrice,
+      })),
+    });
   }
 }
