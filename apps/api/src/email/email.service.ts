@@ -110,13 +110,13 @@ export class EmailService {
   private getPaymentStatusLabel(status: string) {
     switch (status) {
       case 'SUCCESS':
-        return 'Thanh cong';
+        return 'Thành công';
       case 'FAILED':
-        return 'That bai';
+        return 'Thất bại';
       case 'TIMEOUT':
-        return 'Het thoi gian';
+        return 'Hết thời gian';
       case 'PENDING':
-        return 'Dang cho';
+        return 'Đang chờ';
       default:
         return status;
     }
