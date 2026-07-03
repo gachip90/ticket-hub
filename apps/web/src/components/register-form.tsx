@@ -48,7 +48,7 @@ export function RegisterForm() {
   return (
     <AuthShell
       title="Đăng ký"
-      description="Tạo tài khoản để bắt đầu đặt vé, theo dõi lịch sử giao dịch và tiếp tục thanh toán."
+      description="Tạo tài khoản để bắt đầu đặt vé, theo dõi lịch sử giao dịch và tiếp tục thanh toán"
       imageUrl="register_background.avif"
     >
       <Form<RegisterFormValues>

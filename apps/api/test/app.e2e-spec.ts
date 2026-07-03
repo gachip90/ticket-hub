@@ -26,7 +26,7 @@ describe('AppController (e2e)', () => {
 
         expect(response).toEqual({
           status: 'ok',
-          service: 'mini-ticketbox-api',
+          service: 'ticket-hub-api',
           timestamp: response.timestamp,
         });
         expect(typeof response.timestamp).toBe('string');

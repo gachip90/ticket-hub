@@ -49,7 +49,7 @@ export function LoginForm() {
   return (
     <AuthShell
       title="Đăng nhập"
-      description="Đăng nhập để tiếp tục khám phá sự kiện và hoàn tất hành trình đặt vé của bạn."
+      description="Đăng nhập để tiếp tục khám phá sự kiện và hoàn tất hành trình đặt vé của bạn"
       imageUrl="login_background.avif"
     >
       <Form<LoginFormValues>

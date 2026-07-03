@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 export interface HealthResponse {
   status: 'ok';
-  service: 'mini-ticketbox-api';
+  service: 'ticket-hub-api';
   timestamp: string;
 }
 
@@ -11,7 +11,7 @@ export class AppService {
   getHealth(): HealthResponse {
     return {
       status: 'ok',
-      service: 'mini-ticketbox-api',
+      service: 'ticket-hub-api',
       timestamp: new Date().toISOString(),
     };
   }

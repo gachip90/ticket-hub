@@ -82,26 +82,26 @@ export class EmailService {
     return `
       <div style="font-family:Arial,sans-serif;background:#f8fafc;padding:24px;color:#0f172a;">
         <div style="max-width:680px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;">
-          <h1 style="margin:0 0 16px;font-size:24px;">Ticket Hub xac nhan thanh toan sandbox</h1>
-          <p style="margin:0 0 12px;">Dem nhac: <strong>${payload.concertName}</strong></p>
-          <p style="margin:0 0 12px;">Ma don hang: <strong>${payload.orderCode}</strong></p>
-          <p style="margin:0 0 12px;">Email nguoi dat: <strong>${payload.userEmail}</strong></p>
-          <p style="margin:0 0 12px;">Nguoi nhan ve: <strong>${payload.recipientName}</strong> &lt;${payload.recipientEmail}&gt;</p>
-          <p style="margin:0 0 12px;">Trang thai thanh toan: <strong>${this.getPaymentStatusLabel(payload.paymentStatus)}</strong></p>
-          <p style="margin:0 0 16px;">Thoi gian tao: <strong>${this.formatDate(payload.createdAt)}</strong></p>
+          <h1 style="margin:0 0 16px;font-size:24px;">Ticket Hub xác nhận thanh toán</h1>
+          <p style="margin:0 0 12px;">Đêm nhạc: <strong>${payload.concertName}</strong></p>
+          <p style="margin:0 0 12px;">Mã đơn hàng: <strong>${payload.orderCode}</strong></p>
+          <p style="margin:0 0 12px;">Email người đặt: <strong>${payload.userEmail}</strong></p>
+          <p style="margin:0 0 12px;">Người nhận vé: <strong>${payload.recipientName}</strong> &lt;${payload.recipientEmail}&gt;</p>
+          <p style="margin:0 0 12px;">Trạng thái thanh toán: <strong>${this.getPaymentStatusLabel(payload.paymentStatus)}</strong></p>
+          <p style="margin:0 0 16px;">Thời gian tạo: <strong>${this.formatDate(payload.createdAt)}</strong></p>
           <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
             <thead>
               <tr style="background:#f1f5f9;">
-                <th style="padding:8px;border:1px solid #e2e8f0;text-align:left;">Hang ve</th>
-                <th style="padding:8px;border:1px solid #e2e8f0;text-align:center;">So luong</th>
-                <th style="padding:8px;border:1px solid #e2e8f0;text-align:right;">Don gia</th>
-                <th style="padding:8px;border:1px solid #e2e8f0;text-align:right;">Thanh tien</th>
+                <th style="padding:8px;border:1px solid #e2e8f0;text-align:left;">Hạng vé</th>
+                <th style="padding:8px;border:1px solid #e2e8f0;text-align:center;">Số lượng</th>
+                <th style="padding:8px;border:1px solid #e2e8f0;text-align:right;">Đơn giá</th>
+                <th style="padding:8px;border:1px solid #e2e8f0;text-align:right;">Thành tiền</th>
               </tr>
             </thead>
             <tbody>${itemRows}</tbody>
           </table>
-          <p style="margin:0 0 12px;font-size:18px;">Tong thanh toan: <strong>${this.formatCurrency(payload.totalAmount)}</strong></p>
-          <p style="margin:0;color:#475569;">Day la email xac nhan sandbox duoc gui tu moi truong Mailpit/MailHog local.</p>
+          <p style="margin:0 0 12px;font-size:18px;">Tổng thanh toán: <strong>${this.formatCurrency(payload.totalAmount)}</strong></p>
+          <p style="margin:0;color:#475569;">Đây là email xác nhận sandbox được gửi từ môi trường Mailpit/MailHog local.</p>
         </div>
       </div>
     `;

@@ -1,10 +1,11 @@
+name: ticket-hub
+
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: mini-ticketbox-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: mini_ticketbox
+      POSTGRES_DB: ticket_hub
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -14,14 +15,12 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: mini-ticketbox-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
 
   mailpit:
     image: axllent/mailpit:latest
-    container_name: mini-ticketbox-mailpit
     restart: unless-stopped
     ports:
       - "8025:8025"

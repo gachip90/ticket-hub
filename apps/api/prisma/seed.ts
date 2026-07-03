@@ -26,29 +26,29 @@ async function main() {
   ]);
 
   await prisma.user.upsert({
-    where: { email: 'admin@miniticketbox.local' },
+    where: { email: 'admin@tickethub.local' },
     update: {
-      name: 'Quản trị viên Vé Concert',
+      name: 'Quản trị viên Ticket Hub',
       passwordHash: adminPasswordHash,
       role: UserRole.ADMIN,
     },
     create: {
-      email: 'admin@miniticketbox.local',
-      name: 'Quản trị viên Vé Concert',
+      email: 'admin@tickethub.local',
+      name: 'Quản trị viên Ticket Hub',
       passwordHash: adminPasswordHash,
       role: UserRole.ADMIN,
     },
   });
 
   await prisma.user.upsert({
-    where: { email: 'user@miniticketbox.local' },
+    where: { email: 'user@tickethub.local' },
     update: {
       name: 'Người dùng Demo',
       passwordHash: userPasswordHash,
       role: UserRole.USER,
     },
     create: {
-      email: 'user@miniticketbox.local',
+      email: 'user@tickethub.local',
       name: 'Người dùng Demo',
       passwordHash: userPasswordHash,
       role: UserRole.USER,
@@ -59,7 +59,8 @@ async function main() {
     {
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Đêm Nhạc Sắc Màu Thành Phố',
-      description: 'Đại nhạc hội nổi bật với đầy đủ hạng vé VIP, Standard và Economy.',
+      description:
+        'Đại nhạc hội nổi bật với đầy đủ hạng vé VIP, Standard và Economy',
       venue: 'Nhà thi đấu Thủ Thiêm, TP. Hồ Chí Minh',
       startAt: '2026-08-15T20:00:00.000Z',
       salesOpenAt: '2026-07-01T00:00:00.000Z',
@@ -73,7 +74,8 @@ async function main() {
     {
       id: '22222222-2222-4222-8222-222222222222',
       name: 'Lễ Hội Âm Thanh Hoàng Hôn',
-      description: 'Đêm nhạc ngoài trời với hai hạng vé dành cho khán giả yêu không khí lễ hội.',
+      description:
+        'Đêm nhạc ngoài trời với hai hạng vé dành cho khán giả yêu không khí lễ hội',
       venue: 'Sân khấu Bến Bạch Đằng, TP. Hồ Chí Minh',
       startAt: '2026-09-05T18:30:00.000Z',
       salesOpenAt: '2026-07-10T00:00:00.000Z',
@@ -86,7 +88,8 @@ async function main() {
     {
       id: '33333333-3333-4333-8333-333333333333',
       name: 'Đêm Acoustic Dưới Ánh Trăng',
-      description: 'Đêm acoustic gần gũi với khu vực đứng cao cấp và khu vực tiêu chuẩn.',
+      description:
+        'Đêm acoustic gần gũi với khu vực đứng cao cấp và khu vực tiêu chuẩn',
       venue: 'Nhà hát Ánh Đèn, Đà Nẵng',
       startAt: '2026-09-20T19:00:00.000Z',
       salesOpenAt: '2026-07-12T00:00:00.000Z',
@@ -99,7 +102,8 @@ async function main() {
     {
       id: '44444444-4444-4444-8444-444444444444',
       name: 'Đại Tiệc Ánh Sáng Cuối Năm',
-      description: 'Sự kiện trình diễn sôi động với khu VIP giới hạn và khu Standard quy mô lớn.',
+      description:
+        'Sự kiện trình diễn sôi động với khu VIP giới hạn và khu Standard quy mô lớn',
       venue: 'Cung thể thao Tây Hồ, Hà Nội',
       startAt: '2026-10-10T21:00:00.000Z',
       salesOpenAt: '2026-07-15T00:00:00.000Z',

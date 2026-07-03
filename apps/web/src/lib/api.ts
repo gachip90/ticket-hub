@@ -21,14 +21,21 @@ export type ApiError = {
   timestamp: string;
 };
 
+export type AuthExpiredEventDetail = {
+  message: string;
+  redirectTo: string;
+};
+
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
-const ACCESS_TOKEN_KEY = 'mini-ticketbox.accessToken';
-const USER_KEY = 'mini-ticketbox.user';
-const AUTH_STORE_EVENT = 'mini-ticketbox.auth-change';
+const ACCESS_TOKEN_KEY = 'ticket-hub.accessToken';
+const USER_KEY = 'ticket-hub.user';
+const AUTH_STORE_EVENT = 'ticket-hub.auth-change';
+const AUTH_EXPIRED_EVENT = 'ticket-hub.auth-expired';
 
 let cachedUserRaw: string | null | undefined;
 let cachedUserSnapshot: AuthUser | null = null;
+let isHandlingExpiredSession = false;
 
 function isApiError(payload: unknown): payload is ApiError {
   return (
@@ -41,12 +48,44 @@ function isApiError(payload: unknown): payload is ApiError {
   );
 }
 
-async function readJson<TResponse>(response: Response, path: string) {
+function notifyExpiredSession(message: string) {
+  if (typeof window === 'undefined' || isHandlingExpiredSession) {
+    return;
+  }
+
+  isHandlingExpiredSession = true;
+
+  const redirectTo = `${window.location.pathname}${window.location.search}`;
+  clearAuthSession();
+  window.dispatchEvent(
+    new CustomEvent<AuthExpiredEventDetail>(AUTH_EXPIRED_EVENT, {
+      detail: {
+        message,
+        redirectTo: redirectTo.startsWith('/login') ? '/' : redirectTo,
+      },
+    }),
+  );
+
+  window.setTimeout(() => {
+    isHandlingExpiredSession = false;
+  }, 0);
+}
+
+async function readJson<TResponse>(
+  response: Response,
+  path: string,
+  options?: { withAuth?: boolean },
+) {
   const payload = (await response.json()) as TResponse | ApiError;
 
   if (!response.ok) {
     const message = isApiError(payload) ? payload.error.message : 'Request failed.';
     const statusCode = isApiError(payload) ? payload.error.statusCode : response.status;
+
+    if (statusCode === 401 && options?.withAuth) {
+      notifyExpiredSession(translateApiError(statusCode, message, path));
+    }
+
     throw new Error(translateApiError(statusCode, message, path));
   }
 
@@ -86,7 +125,7 @@ export async function apiGet<TResponse>(
     cache: 'no-store',
   });
 
-  return readJson<TResponse>(response, path);
+  return readJson<TResponse>(response, path, options);
 }
 
 export async function apiPost<TResponse>(
@@ -100,7 +139,11 @@ export async function apiPost<TResponse>(
     body: JSON.stringify(body),
   });
 
-  return readJson<TResponse extends object ? TResponse : never>(response, path);
+  return readJson<TResponse extends object ? TResponse : never>(
+    response,
+    path,
+    options,
+  );
 }
 
 export function storeAuthSession(auth: AuthResponse) {
@@ -171,6 +214,24 @@ export function subscribeAuthStore(onStoreChange: () => void) {
   return () => {
     window.removeEventListener('storage', handler);
     window.removeEventListener(AUTH_STORE_EVENT, handler);
+  };
+}
+
+export function subscribeExpiredSession(
+  onSessionExpired: (detail: AuthExpiredEventDetail) => void,
+) {
+  if (typeof window === 'undefined') {
+    return () => undefined;
+  }
+
+  const handler = (event: Event) => {
+    onSessionExpired((event as CustomEvent<AuthExpiredEventDetail>).detail);
+  };
+
+  window.addEventListener(AUTH_EXPIRED_EVENT, handler as EventListener);
+
+  return () => {
+    window.removeEventListener(AUTH_EXPIRED_EVENT, handler as EventListener);
   };
 }
 

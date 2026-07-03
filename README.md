@@ -4,8 +4,8 @@
 
 ## 1. Thông tin ứng viên
 
-- Họ tên: `<Điền họ tên>`
-- GitHub username: `<Điền GitHub username>`
+- Họ tên: `Đinh Tiến Đạt`
+- GitHub username: `gachip90`
 
 ## 2. Tổng quan dự án
 
@@ -61,12 +61,12 @@ Hệ thống seed **4 concert** để phục vụ test và demo.
 
 Concert chính có tổng cộng đúng **500 vé**:
 
-| Loại vé | Giá | Số lượng |
-| --- | ---: | ---: |
-| VIP | 2.000.000 VND | 50 |
-| Standard | 1.000.000 VND | 300 |
-| Economy | 500.000 VND | 150 |
-| Tổng | - | 500 |
+| Loại vé  |           Giá | Số lượng |
+| -------- | ------------: | -------: |
+| VIP      | 2.000.000 VND |       50 |
+| Standard | 1.000.000 VND |      300 |
+| Economy  |   500.000 VND |      150 |
+| Tổng     |             - |      500 |
 
 ## 6. Core invariants
 
@@ -105,11 +105,11 @@ Redis: localhost:6379
 
 ```txt
 Admin:
-  email: admin@miniticketbox.local
+  email: admin@tickethub.local
   password: Admin@123456
 
 User:
-  email: user@miniticketbox.local
+  email: user@tickethub.local
   password: User@123456
 ```
 
@@ -170,7 +170,7 @@ corepack pnpm test
 Chạy các suite backend quan trọng:
 
 ```bash
-corepack pnpm --filter @mini-ticketbox/api test -- reservations.service.spec.ts payments.service.spec.ts admin.service.spec.ts roles.guard.spec.ts email.service.spec.ts
+corepack pnpm --filter @ticket-hub/api test -- reservations.service.spec.ts payments.service.spec.ts admin.service.spec.ts roles.guard.spec.ts email.service.spec.ts
 ```
 
 ## 14. Chiến lược chống overselling
@@ -293,24 +293,39 @@ docs/screenshots/
 Placeholder trong README:
 
 ### Trang sự kiện
+
 ![Trang sự kiện](docs/screenshots/home.png)
 
+### Trang đăng ký
+
+![Trang đăng ký](docs/screenshots/register.png)
+
 ### Trang đăng nhập
+
 ![Trang đăng nhập](docs/screenshots/login.png)
 
+### Trang thông tin vé
+
+![Trang thông tin vé](docs/screenshots/overview.png)
+
 ### Trang chọn vé
+
 ![Trang chọn vé](docs/screenshots/booking.png)
 
 ### Trang checkout
+
 ![Trang checkout](docs/screenshots/checkout.png)
 
 ### Lịch sử đơn hàng
+
 ![Lịch sử đơn hàng](docs/screenshots/orders.png)
 
 ### Admin dashboard
+
 ![Admin dashboard](docs/screenshots/admin-dashboard.png)
 
 ### Mailpit inbox
+
 ![Mailpit inbox](docs/screenshots/mailpit-email.png)
 
 ## 20. Ghi chú nộp bài

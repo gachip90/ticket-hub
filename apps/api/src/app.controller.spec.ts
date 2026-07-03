@@ -20,7 +20,7 @@ describe('AppController', () => {
 
       expect(response).toEqual({
         status: 'ok',
-        service: 'mini-ticketbox-api',
+        service: 'ticket-hub-api',
         timestamp: response.timestamp,
       });
       expect(typeof response.timestamp).toBe('string');

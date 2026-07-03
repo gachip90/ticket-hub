@@ -105,7 +105,7 @@ function createReservationFixture(
     updatedAt: new Date('2099-07-02T10:00:00.000Z'),
     event: {
       id: 'event-1',
-      name: 'Mini TicketBox Concert',
+      name: 'Ticket Hub Concert',
       venue: 'Ho Chi Minh City',
       startAt: new Date('2099-08-01T12:00:00.000Z'),
     },
@@ -242,7 +242,7 @@ describe('PaymentsService', () => {
     expect(inventoryService.syncEventInventory).toHaveBeenCalledWith('event-1');
     expect(emailService.sendPaymentConfirmationEmail).toHaveBeenCalledWith(
       expect.objectContaining({
-        concertName: 'Mini TicketBox Concert',
+        concertName: 'Ticket Hub Concert',
         orderCode: order.code,
         userEmail: 'user-1@example.com',
         recipientEmail: 'user-1@example.com',

@@ -8,7 +8,6 @@ import {
   Result,
   Skeleton,
   Space,
-  Statistic,
   Tag,
   Typography,
 } from "antd";
@@ -31,11 +30,163 @@ import {
 } from "../../../../lib/format";
 import { subscribeAllInventoryStream } from "../../../../lib/inventory-stream";
 
+const SKELETON_PARAGRAPH_16_ROWS = {
+  rows: 16,
+  width: Array.from({ length: 16 }, () => "100%"),
+};
+
+const SKELETON_PARAGRAPH_10_ROWS = {
+  rows: 10,
+  width: Array.from({ length: 10 }, () => "100%"),
+};
+
 type DashboardState = {
   stats: AdminStatsResponse | null;
   heldReservations: AdminHeldReservation[];
   orders: AdminOrder[];
 };
+
+type HighlightStatCardProps = {
+  title: string;
+  value: string | number;
+  helperText: string;
+  accentClassName: string;
+  badgeClassName: string;
+  icon: React.ReactNode;
+};
+
+function HighlightStatCard({
+  title,
+  value,
+  helperText,
+  accentClassName,
+  badgeClassName,
+  icon,
+}: HighlightStatCardProps) {
+  return (
+    <Card
+      className={`overflow-hidden rounded-[30px] border-0 shadow-[0_24px_55px_rgba(15,23,42,0.10)] ${accentClassName}`}
+      styles={{ body: { padding: 0 } }}
+    >
+      <div className="relative px-6 py-5">
+        <div className="absolute inset-x-0 top-0 h-1.5 bg-white/70" />
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500/90">
+              {title}
+            </p>
+            <p className="mt-4 text-[36px] font-extrabold leading-none text-slate-950">
+              {value}
+            </p>
+          </div>
+
+          <div
+            className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] ${badgeClassName}`}
+          >
+            {icon}
+          </div>
+        </div>
+
+        <div className="mt-5 flex items-center gap-2 text-sm font-medium text-slate-600">
+          <span className="h-2 w-2 rounded-full bg-current opacity-70" />
+          <span>{helperText}</span>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function TicketsSoldIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-7 w-7 text-current"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M7 7.5V6.75C7 5.7835 7.7835 5 8.75 5H15.25C16.2165 5 17 5.7835 17 6.75V7.5C18.3807 7.5 19.5 8.61929 19.5 10V11C18.1193 11 17 12.1193 17 13.5V14.25C17 15.2165 16.2165 16 15.25 16H8.75C7.7835 16 7 15.2165 7 14.25V13.5C5.61929 13.5 4.5 12.3807 4.5 11V10C5.88071 10 7 8.88071 7 7.5Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M12 7.5V13.5"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeDasharray="2 2"
+      />
+    </svg>
+  );
+}
+
+function HoldIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-7 w-7 text-current"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 6.5V12L15.5 14"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M19.5 12C19.5 16.1421 16.1421 19.5 12 19.5C7.85786 19.5 4.5 16.1421 4.5 12C4.5 7.85786 7.85786 4.5 12 4.5C16.1421 4.5 19.5 7.85786 19.5 12Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+function InventoryIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-7 w-7 text-current"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M5 8.25L12 4.5L19 8.25M5 8.25V15.75L12 19.5M5 8.25L12 12M19 8.25V15.75L12 19.5M19 8.25L12 12M12 12V19.5"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function RevenueIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-7 w-7 text-current"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 5V19M15.5 8.5C15.5 7.11929 13.933 6 12 6C10.067 6 8.5 7.11929 8.5 8.5C8.5 9.88071 10.067 11 12 11C13.933 11 15.5 12.1193 15.5 13.5C15.5 14.8807 13.933 16 12 16C10.067 16 8.5 14.8807 8.5 13.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 function reservationStatusColor(status: AdminHeldReservation["status"]) {
   switch (status) {
@@ -348,7 +499,11 @@ export default function AdminDashboardPage() {
     return (
       <MainPageFrame header={<MainHeader />}>
         <Card className="rounded-[32px] border-slate-200">
-          <Skeleton active paragraph={{ rows: 16 }} />
+          <Skeleton
+            active
+            title={false}
+            paragraph={SKELETON_PARAGRAPH_16_ROWS}
+          />
         </Card>
       </MainPageFrame>
     );
@@ -358,7 +513,11 @@ export default function AdminDashboardPage() {
     return (
       <MainPageFrame header={<MainHeader />}>
         <Card className="rounded-[32px] border-slate-200">
-          <Skeleton active paragraph={{ rows: 10 }} />
+          <Skeleton
+            active
+            title={false}
+            paragraph={SKELETON_PARAGRAPH_10_ROWS}
+          />
         </Card>
       </MainPageFrame>
     );
@@ -370,7 +529,7 @@ export default function AdminDashboardPage() {
         <Result
           status="403"
           title="Cần quyền quản trị"
-          subTitle="Bạn không có quyền truy cập trang quản trị."
+          subTitle="Bạn không có quyền truy cập trang quản trị"
           extra={
             <Button type="primary" onClick={() => router.push("/")}>
               Về trang sự kiện
@@ -444,24 +603,38 @@ export default function AdminDashboardPage() {
 
         {stats ? (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <Card className="rounded-[28px] border-slate-200">
-              <Statistic title="Vé đã bán" value={stats.totalSoldTickets} />
-            </Card>
-            <Card className="rounded-[28px] border-slate-200">
-              <Statistic title="Vé đang giữ" value={stats.totalHeldTickets} />
-            </Card>
-            <Card className="rounded-[28px] border-slate-200">
-              <Statistic
-                title="Vé còn lại"
-                value={stats.totalAvailableTickets}
-              />
-            </Card>
-            <Card className="rounded-[28px] border-slate-200">
-              <Statistic
-                title="Doanh thu"
-                value={dinhDangTien(stats.totalRevenue)}
-              />
-            </Card>
+            <HighlightStatCard
+              title="Vé đã bán"
+              value={stats.totalSoldTickets}
+              helperText="Lượng vé đã chốt thành công"
+              accentClassName="bg-[linear-gradient(135deg,#fff1f2_0%,#ffffff_62%)]"
+              badgeClassName="bg-rose-100 text-rose-600"
+              icon={<TicketsSoldIcon />}
+            />
+            <HighlightStatCard
+              title="Vé đang giữ"
+              value={stats.totalHeldTickets}
+              helperText="Các phiên checkout còn hiệu lực"
+              accentClassName="bg-[linear-gradient(135deg,#fff8e8_0%,#ffffff_62%)]"
+              badgeClassName="bg-amber-100 text-amber-600"
+              icon={<HoldIcon />}
+            />
+            <HighlightStatCard
+              title="Vé còn lại"
+              value={stats.totalAvailableTickets.toLocaleString("vi-VN")}
+              helperText="Tồn kho sẵn sàng để mở bán"
+              accentClassName="bg-[linear-gradient(135deg,#ecfeff_0%,#ffffff_62%)]"
+              badgeClassName="bg-sky-100 text-sky-600"
+              icon={<InventoryIcon />}
+            />
+            <HighlightStatCard
+              title="Doanh thu"
+              value={dinhDangTien(stats.totalRevenue)}
+              helperText="Tổng giá trị đơn đã ghi nhận"
+              accentClassName="bg-[linear-gradient(135deg,#ecfdf5_0%,#ffffff_62%)]"
+              badgeClassName="bg-emerald-100 text-emerald-600"
+              icon={<RevenueIcon />}
+            />
           </div>
         ) : null}
 
@@ -552,7 +725,7 @@ export default function AdminDashboardPage() {
             </div>
           </Card>
 
-          <Space direction="vertical" size={24} className="w-full">
+          <Space orientation="vertical" size={24} className="w-full">
             <Card className="rounded-[32px] border-slate-200 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>

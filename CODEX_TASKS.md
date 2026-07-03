@@ -1,4 +1,4 @@
-# CODEX_TASKS.md - Mini TicketBox Implementation Checklist
+# CODEX_TASKS.md - Ticket Hub Implementation Checklist
 
 Use this checklist as the execution order for Codex.
 

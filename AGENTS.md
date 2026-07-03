@@ -1,8 +1,8 @@
-# AGENTS.md - Mini TicketBox
+# AGENTS.md - Ticket Hub
 
 ## Project
 
-Mini TicketBox - Hệ thống đặt vé Concert.
+Ticket Hub - Hệ thống đặt vé Concert.
 
 This project is a fullstack concert ticket booking mini project. The main evaluation focus is concurrency handling, anti-overselling, high-load UX, clean code, validation, global error handling, and unit tests.
 

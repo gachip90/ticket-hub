@@ -80,6 +80,32 @@ function DashboardIcon() {
   );
 }
 
+function OrdersIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-4 w-4 text-slate-500"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M5.83333 3.33333H14.1667C15.0871 3.33333 15.8333 4.07953 15.8333 5V15C15.8333 15.9205 15.0871 16.6667 14.1667 16.6667H5.83333C4.91286 16.6667 4.16667 15.9205 4.16667 15V5C4.16667 4.07953 4.91286 3.33333 5.83333 3.33333Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M7.5 7.5H12.5M7.5 10.8333H12.5M7.5 14.1667H10.8333"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 function layTenGoi(user: AuthUser | null) {
   if (!user) {
     return null;
@@ -125,6 +151,11 @@ export function MainHeader({
         ]
       : []),
     {
+      key: "order-history",
+      icon: <OrdersIcon />,
+      label: <span className="pl-2">Lịch sử đặt vé</span>,
+    },
+    {
       key: "logout",
       icon: <LogoutIcon />,
       label: <span className="pl-2">Đăng xuất</span>,
@@ -134,6 +165,11 @@ export function MainHeader({
   function xuLyMenuClick({ key }: { key: string }) {
     if (key === "admin-dashboard") {
       router.push("/admin/dashboard");
+      return;
+    }
+
+    if (key === "order-history") {
+      router.push("/me/orders");
       return;
     }
 

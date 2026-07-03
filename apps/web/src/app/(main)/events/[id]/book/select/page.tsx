@@ -28,6 +28,15 @@ type RecipientFormValues = {
   recipientPhone: string;
 };
 
+function RequiredLabel({ children }: { children: string }) {
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span>{children}</span>
+      <span className="text-rose-500">*</span>
+    </span>
+  );
+}
+
 function SeatMapIllustration() {
   const blocks = [
     { label: "VIP Left", color: "bg-rose-400/85 text-white" },
@@ -91,7 +100,7 @@ function SeatMapIllustration() {
           </p>
           <p className="mt-2 text-sm leading-7 text-slate-300">
             Minh họa này giúp người dùng hình dung bố cục sân khấu và các vùng
-            vé.
+            vé
           </p>
         </div>
       </div>
@@ -355,16 +364,12 @@ export default function EventTicketSelectionPage() {
 
   function handleOpenRecipientModal() {
     if (!selectedTicketType || !event) {
-      setError(
-        "Bạn cần chọn một hạng vé trước khi tiếp tục.",
-      );
+      setError("Bạn cần chọn một hạng vé trước khi tiếp tục.");
       return;
     }
 
     if (isSelectionExpired) {
-      setError(
-        "Phiên chọn vé đã hết hạn. Vui lòng tải lại trang.",
-      );
+      setError("Phiên chọn vé đã hết hạn. Vui lòng tải lại trang.");
       return;
     }
 
@@ -387,16 +392,12 @@ export default function EventTicketSelectionPage() {
 
   async function handleReserveTickets(values: RecipientFormValues) {
     if (!selectedTicketType || !event) {
-      setError(
-        "Bạn cần chọn một hạng vé trước khi tiếp tục.",
-      );
+      setError("Bạn cần chọn một hạng vé trước khi tiếp tục.");
       return;
     }
 
     if (isSelectionExpired) {
-      setError(
-        "Phiên chọn vé đã hết hạn. Vui lòng tải lại trang.",
-      );
+      setError("Phiên chọn vé đã hết hạn. Vui lòng tải lại trang.");
       return;
     }
 
@@ -486,8 +487,7 @@ export default function EventTicketSelectionPage() {
             Thông tin nhận vé
           </Typography.Title>
           <Typography.Paragraph className="mb-6 text-center text-base text-slate-500">
-            Điền thông tin người đại diện nhận vé trước khi chuyển sang trang
-            thanh toán.
+            Điền thông tin người đại diện nhận vé
           </Typography.Paragraph>
 
           {recipientError ? (
@@ -505,7 +505,7 @@ export default function EventTicketSelectionPage() {
             layout="vertical"
             onFinish={(values) => void handleReserveTickets(values)}
             disabled={isSubmitting}
-            requiredMark={false}
+            requiredMark
             className="[&_.ant-form-item-label>label]:text-sm [&_.ant-form-item-label>label]:font-bold [&_.ant-form-item]:mb-4"
           >
             <Form.Item
@@ -744,13 +744,13 @@ export default function EventTicketSelectionPage() {
                 </div>
               </div>
 
-              <aside className="rounded-[28px] bg-slate-50/90 px-5 py-5 min-[1800px]:self-start">
+              <aside className="rounded-[28px] bg-slate-50/90 px-4 py-4 min-[1800px]:self-start">
                 <Typography.Text className="text-sm font-semibold text-slate-500">
                   Vé đã chọn
                 </Typography.Text>
 
                 {selectedTicketType ? (
-                  <div className="mt-5 rounded-[24px] bg-white px-5 py-5 shadow-[0_20px_50px_rgba(15,23,42,0.06)]">
+                  <div className="mt-5 rounded-3xl bg-white px-5 py-5 shadow-[0_20px_50px_rgba(15,23,42,0.06)]">
                     <Typography.Text className="block text-base font-extrabold text-slate-950">
                       {selectedTicketType.name}
                     </Typography.Text>

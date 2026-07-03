@@ -51,7 +51,7 @@ function createHeldReservation(status = ReservationStatus.HELD) {
     updatedAt: new Date('2026-07-02T10:00:00.000Z'),
     event: {
       id: 'event-1',
-      name: 'Mini TicketBox Concert',
+      name: 'Ticket Hub Concert',
       venue: 'Ho Chi Minh City',
       startAt: new Date('2026-08-01T12:00:00.000Z'),
     },

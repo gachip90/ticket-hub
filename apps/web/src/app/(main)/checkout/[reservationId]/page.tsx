@@ -28,6 +28,11 @@ import {
   dinhDangTien,
 } from "../../../../lib/format";
 
+const SKELETON_PARAGRAPH_12_ROWS = {
+  rows: 12,
+  width: Array.from({ length: 12 }, () => "100%"),
+};
+
 type CheckoutStage = "idle" | "success" | "failed" | "expired";
 
 export default function CheckoutPage() {
@@ -282,7 +287,11 @@ export default function CheckoutPage() {
     <MainPageFrame>
       {isLoading ? (
         <Card className="rounded-4xl border-slate-200">
-          <Skeleton active paragraph={{ rows: 12 }} />
+          <Skeleton
+            active
+            title={false}
+            paragraph={SKELETON_PARAGRAPH_12_ROWS}
+          />
         </Card>
       ) : !reservation ? (
         <Result
@@ -297,7 +306,7 @@ export default function CheckoutPage() {
         />
       ) : (
         <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-          <Space direction="vertical" size={24} className="w-full">
+          <Space orientation="vertical" size={24} className="w-full">
             <Card className="rounded-4xl border-slate-200 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
               <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                 <div>
@@ -311,7 +320,7 @@ export default function CheckoutPage() {
                     {reservation.event.name}
                   </Typography.Title>
                   <Typography.Paragraph className="mb-0 text-sm leading-7 text-slate-500">
-                    Hoàn tất thanh toán trước khi phiên giữ vé hết hạn.
+                    Hoàn tất thanh toán trước khi phiên giữ vé hết hạn
                   </Typography.Paragraph>
                 </div>
 
@@ -382,7 +391,7 @@ export default function CheckoutPage() {
               <Result
                 status="warning"
                 title="Thanh toán thất bại"
-                subTitle="Backend đã release reservation ngay lập tức theo flow sandbox hiện tại."
+                subTitle="Backend đã release reservation ngay lập tức theo flow sandbox hiện tại"
                 extra={[
                   <Button
                     key="refresh"
@@ -423,7 +432,7 @@ export default function CheckoutPage() {
             ) : null}
           </Space>
 
-          <Space direction="vertical" size={24} className="w-full">
+          <Space orientation="vertical" size={24} className="w-full">
             <Card className="rounded-4xl border-slate-200 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
               <Typography.Title
                 level={3}
@@ -499,7 +508,7 @@ export default function CheckoutPage() {
               </Typography.Title>
               <Typography.Paragraph className="mb-6 text-sm leading-7 text-slate-500">
                 Đây là luồng thanh toán giả lập để test anti-overselling,
-                timeout và idempotency.
+                timeout và idempotency
               </Typography.Paragraph>
 
               <div className="rounded-3xl bg-slate-950 px-5 py-5 text-white">

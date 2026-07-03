@@ -31,8 +31,8 @@ describe('EmailService', () => {
     await service.sendPaymentConfirmationEmail({
       concertName: 'Dem Nhac Sac Mau Thanh Pho',
       orderCode: 'ORD-000001',
-      userEmail: 'user@miniticketbox.local',
-      recipientEmail: 'user@miniticketbox.local',
+      userEmail: 'user@tickethub.local',
+      recipientEmail: 'user@tickethub.local',
       recipientName: 'Demo User',
       paymentStatus: 'SUCCESS',
       totalAmount: 4_000_000,
@@ -49,7 +49,7 @@ describe('EmailService', () => {
 
     expect(sendMail).toHaveBeenCalledWith(
       expect.objectContaining({
-        to: 'user@miniticketbox.local',
+        to: 'user@tickethub.local',
         subject: expect.stringContaining('Ticket Hub'),
         text: expect.stringContaining('Xac nhan thanh toan sandbox Ticket Hub'),
         html: expect.stringContaining('Ma don hang'),

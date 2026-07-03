@@ -15,6 +15,11 @@ import { dinhDangNgayGioDayDu, dinhDangTien } from "../../../../../lib/format";
 import { mergeInventoryIntoEvent } from "../../../../../lib/inventory";
 import { subscribeEventInventoryStream } from "../../../../../lib/inventory-stream";
 
+const SKELETON_PARAGRAPH_8_ROWS = {
+  rows: 8,
+  width: Array.from({ length: 8 }, () => "100%"),
+};
+
 export default function EventBookPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -117,7 +122,11 @@ export default function EventBookPage() {
     <MainPageFrame header={<MainHeader />}>
       {isLoading ? (
         <Card className="rounded-4xl border-slate-200">
-          <Skeleton active paragraph={{ rows: 8 }} />
+          <Skeleton
+            active
+            title={false}
+            paragraph={SKELETON_PARAGRAPH_8_ROWS}
+          />
         </Card>
       ) : error ? (
         <div className="rounded-[28px] border border-rose-200 bg-rose-50 px-5 py-4 text-sm font-medium text-rose-700">
@@ -188,8 +197,8 @@ export default function EventBookPage() {
               Các hạng vé
             </Typography.Title>
             <Typography.Paragraph className="mb-6 text-sm leading-6 text-slate-500">
-              Bạn có thể xem tình trạng vé mới nhất trước khi chuyển sang màn hình
-              chọn vé và thanh toán.
+              Bạn có thể xem tình trạng vé mới nhất trước khi chuyển sang màn
+              hình chọn vé và thanh toán
             </Typography.Paragraph>
 
             <Tag

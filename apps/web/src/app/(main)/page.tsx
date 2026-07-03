@@ -61,7 +61,7 @@ export default function HomePage() {
           Sự kiện sắp diễn ra
         </Typography.Title>
         <Typography.Paragraph className="mb-0 text-base leading-7 text-slate-500">
-          Khám phá các đêm diễn nổi bật và chọn sự kiện phù hợp.
+          Khám phá các đêm diễn nổi bật và chọn sự kiện phù hợp
         </Typography.Paragraph>
       </div>
 

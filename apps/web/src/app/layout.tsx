@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
-import { Be_Vietnam_Pro } from "next/font/google";
 import "../style/globals.css";
 import { Providers } from "./providers";
 
-const beVietnam = Be_Vietnam_Pro({
-  variable: "--font-be-vietnam",
-  subsets: ["latin", "vietnamese"],
-  weight: ["400", "500", "600", "700", "800"],
-});
-
 export const metadata: Metadata = {
-  title: "Vé Concert",
-  description: "Nền tảng đặt vé concert với luồng thanh toán giả lập",
+  title: "Ticket Hub",
+  description: "Ticket Hub - nền tảng đặt vé concert với luồng thanh toán giả lập",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -20,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={beVietnam.variable}>
+    <html lang="vi">
       <body className="min-h-screen">
         <Providers>{children}</Providers>
       </body>

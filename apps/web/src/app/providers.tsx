@@ -1,7 +1,33 @@
 'use client';
 
 import { AntdRegistry } from '@ant-design/nextjs-registry';
-import { ConfigProvider } from 'antd';
+import { App as AntdApp, ConfigProvider } from 'antd';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import {
+  type AuthExpiredEventDetail,
+  subscribeExpiredSession,
+} from '../lib/api';
+
+function SessionExpiredNotifier() {
+  const router = useRouter();
+  const { message } = AntdApp.useApp();
+
+  useEffect(() => {
+    return subscribeExpiredSession((detail: AuthExpiredEventDetail) => {
+      void message.warning(detail.message, 2.5);
+
+      const loginHref =
+        detail.redirectTo && detail.redirectTo !== '/login'
+          ? `/login?redirect=${encodeURIComponent(detail.redirectTo)}`
+          : '/login';
+
+      router.push(loginHref);
+    });
+  }, [message, router]);
+
+  return null;
+}
 
 export function Providers({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
@@ -37,7 +63,10 @@ export function Providers({ children }: Readonly<{ children: React.ReactNode }>)
           },
         }}
       >
-        {children}
+        <AntdApp>
+          <SessionExpiredNotifier />
+          {children}
+        </AntdApp>
       </ConfigProvider>
     </AntdRegistry>
   );
