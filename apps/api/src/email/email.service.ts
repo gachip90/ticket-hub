@@ -31,7 +31,7 @@ export class EmailService {
 
   async sendPaymentConfirmationEmail(payload: PaymentConfirmationEmailPayload) {
     const from = process.env.SMTP_FROM ?? 'no-reply@tickethub.local';
-    const subject = `[Ticket Hub] Xac nhan thanh toan sandbox ${payload.orderCode}`;
+    const subject = `[Ticket Hub] Xác nhận thanh toán ${payload.orderCode}`;
     const ticketLines = payload.items
       .map(
         (item) =>
@@ -44,18 +44,18 @@ export class EmailService {
       to: payload.recipientEmail,
       subject,
       text: [
-        'Xac nhan thanh toan sandbox Ticket Hub',
+        'Xác nhận thanh toán Ticket Hub',
         '',
-        `Dem nhac: ${payload.concertName}`,
-        `Ma don hang: ${payload.orderCode}`,
-        `Email nguoi dat: ${payload.userEmail}`,
-        `Nguoi nhan ve: ${payload.recipientName} <${payload.recipientEmail}>`,
-        `Chi tiet ve:\n${ticketLines}`,
-        `Tong thanh toan: ${this.formatCurrency(payload.totalAmount)}`,
-        `Trang thai thanh toan: ${this.getPaymentStatusLabel(payload.paymentStatus)}`,
-        `Thoi gian tao: ${this.formatDate(payload.createdAt)}`,
+        `Đêm nhạc: ${payload.concertName}`,
+        `Mã đơn hàng: ${payload.orderCode}`,
+        `Email người đặt: ${payload.userEmail}`,
+        `Người nhận vé: ${payload.recipientName} <${payload.recipientEmail}>`,
+        `Chi tiết vé:\n${ticketLines}`,
+        `Tổng thanh toán: ${this.formatCurrency(payload.totalAmount)}`,
+        `Trạng thái thanh toán: ${this.getPaymentStatusLabel(payload.paymentStatus)}`,
+        `Thời gian tạo: ${this.formatDate(payload.createdAt)}`,
         '',
-        'Day la email xac nhan sandbox duoc gui tu moi truong Mailpit/MailHog local.',
+        'Đây là email xác nhận sandbox được gửi từ môi trường Mailpit/MailHog local.',
       ].join('\n'),
       html: this.renderConfirmationHtml(payload),
     });

@@ -1,12 +1,14 @@
 "use client";
 
-import { Spin, Typography } from "antd";
+import { Spin, Tag, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { EventCard } from "../../components/event-card";
 import { MainHeader } from "../../components/main-header";
 import { MainPageFrame } from "../../components/main-page-frame";
 import { apiGet } from "../../lib/api";
 import type { EventSummary } from "../../lib/events";
+import { mergeInventoryIntoEventSummary } from "../../lib/inventory";
+import { subscribeAllInventoryStream } from "../../lib/inventory-stream";
 
 export default function HomePage() {
   const [events, setEvents] = useState<EventSummary[]>([]);
@@ -14,17 +16,17 @@ export default function HomePage() {
   const [submittedKeyword, setSubmittedKeyword] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isRealtimeConnected, setIsRealtimeConnected] = useState(false);
 
   useEffect(() => {
     async function loadEvents() {
-      setIsLoading(true);
-      setError("");
-
       const path = submittedKeyword.trim()
         ? `/api/events/search?q=${encodeURIComponent(submittedKeyword.trim())}`
         : "/api/events";
 
       try {
+        setIsLoading(true);
+        setError("");
         const response = await apiGet<EventSummary[]>(path);
         setEvents(response);
       } catch (loadError) {
@@ -40,6 +42,50 @@ export default function HomePage() {
 
     void loadEvents();
   }, [submittedKeyword]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function syncEvents() {
+      const path = submittedKeyword.trim()
+        ? `/api/events/search?q=${encodeURIComponent(submittedKeyword.trim())}`
+        : "/api/events";
+
+      try {
+        const response = await apiGet<EventSummary[]>(path);
+
+        if (isCancelled) {
+          return;
+        }
+
+        setEvents(response);
+      } catch {
+        // Keep the last successful snapshot if polling fails.
+      }
+    }
+
+    const timer = window.setInterval(() => {
+      void syncEvents();
+    }, 5000);
+
+    return () => {
+      isCancelled = true;
+      window.clearInterval(timer);
+    };
+  }, [submittedKeyword]);
+
+  useEffect(() => {
+    return subscribeAllInventoryStream({
+      onInventory: (inventory) => {
+        setEvents((currentEvents) =>
+          currentEvents.map((event) =>
+            mergeInventoryIntoEventSummary(event, inventory),
+          ),
+        );
+      },
+      onConnectionChange: setIsRealtimeConnected,
+    });
+  }, []);
 
   return (
     <MainPageFrame
@@ -63,6 +109,17 @@ export default function HomePage() {
         <Typography.Paragraph className="mb-0 text-base leading-7 text-slate-500">
           Khám phá các đêm diễn nổi bật và chọn sự kiện phù hợp
         </Typography.Paragraph>
+        <Tag
+          className={`mt-4 rounded-full border-0 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] ${
+            isRealtimeConnected
+              ? "bg-emerald-50 text-emerald-600"
+              : "bg-amber-50 text-amber-600"
+          }`}
+        >
+          {isRealtimeConnected
+            ? "Đang kết nối realtime"
+            : "Đang dùng polling dự phòng"}
+        </Tag>
       </div>
 
       {isLoading ? (

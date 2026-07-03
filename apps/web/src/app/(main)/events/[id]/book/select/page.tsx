@@ -2,7 +2,7 @@
 
 import { Alert, Button, Card, Form, Input, Modal, Tag, Typography } from "antd";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { MainHeader } from "../../../../../../components/main-header";
 import { MainPageFrame } from "../../../../../../components/main-page-frame";
 import { apiGet, apiPost, getStoredAuthUser } from "../../../../../../lib/api";
@@ -12,7 +12,6 @@ import type {
   EventTicketType,
 } from "../../../../../../lib/events";
 import {
-  dinhDangDemNguoc,
   dinhDangNgayGioDayDu,
   dinhDangTien,
 } from "../../../../../../lib/format";
@@ -20,22 +19,11 @@ import { mergeInventoryIntoEvent } from "../../../../../../lib/inventory";
 import { subscribeEventInventoryStream } from "../../../../../../lib/inventory-stream";
 import type { ReservationDetail } from "../../../../../../lib/reservations";
 
-const SELECTION_SESSION_DURATION_MS = 5 * 60 * 1000;
-
 type RecipientFormValues = {
   recipientName: string;
   recipientEmail: string;
   recipientPhone: string;
 };
-
-function RequiredLabel({ children }: { children: string }) {
-  return (
-    <span className="inline-flex items-center gap-1">
-      <span>{children}</span>
-      <span className="text-rose-500">*</span>
-    </span>
-  );
-}
 
 function SeatMapIllustration() {
   const blocks = [
@@ -157,29 +145,9 @@ export default function EventTicketSelectionPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [recipientError, setRecipientError] = useState("");
-  const [selectionStartedAt, setSelectionStartedAt] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const [isRecipientModalOpen, setIsRecipientModalOpen] = useState(false);
-  const [isExpiredModalOpen, setIsExpiredModalOpen] = useState(false);
   const [isRealtimeConnected, setIsRealtimeConnected] = useState(false);
-
-  useEffect(() => {
-    const syncTimer = window.setTimeout(() => {
-      const now = Date.now();
-      setSelectionStartedAt(now);
-      setCurrentTime(now);
-    }, 0);
-
-    const timer = window.setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 1000);
-
-    return () => {
-      window.clearTimeout(syncTimer);
-      window.clearInterval(timer);
-    };
-  }, []);
 
   useEffect(() => {
     const user = getStoredAuthUser();
@@ -283,15 +251,6 @@ export default function EventTicketSelectionPage() {
     });
   }, [params.id]);
 
-  const remainingMilliseconds = useMemo(() => {
-    if (!selectionStartedAt) {
-      return SELECTION_SESSION_DURATION_MS;
-    }
-
-    return selectionStartedAt + SELECTION_SESSION_DURATION_MS - currentTime;
-  }, [currentTime, selectionStartedAt]);
-
-  const isSelectionExpired = remainingMilliseconds <= 0;
   const selectedTicketType =
     event?.ticketTypes.find(
       (ticketType) => ticketType.id === selectedTicketTypeId,
@@ -299,22 +258,6 @@ export default function EventTicketSelectionPage() {
   const totalAmount = selectedTicketType
     ? selectedTicketType.price * quantity
     : 0;
-
-  useEffect(() => {
-    if (isLoading || !event || isExpiredModalOpen || !isSelectionExpired) {
-      return;
-    }
-
-    const timer = window.setTimeout(() => {
-      setIsRecipientModalOpen(false);
-      setIsLeaveModalOpen(false);
-      setIsExpiredModalOpen(true);
-    }, 0);
-
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [event, isExpiredModalOpen, isLoading, isSelectionExpired]);
 
   function handleIncrease(ticketType: EventTicketType) {
     if (ticketType.availableQuantity <= 0) {
@@ -368,11 +311,6 @@ export default function EventTicketSelectionPage() {
       return;
     }
 
-    if (isSelectionExpired) {
-      setError("Phiên chọn vé đã hết hạn. Vui lòng tải lại trang.");
-      return;
-    }
-
     setRecipientError("");
 
     const user = getStoredAuthUser();
@@ -393,11 +331,6 @@ export default function EventTicketSelectionPage() {
   async function handleReserveTickets(values: RecipientFormValues) {
     if (!selectedTicketType || !event) {
       setError("Bạn cần chọn một hạng vé trước khi tiếp tục.");
-      return;
-    }
-
-    if (isSelectionExpired) {
-      setError("Phiên chọn vé đã hết hạn. Vui lòng tải lại trang.");
       return;
     }
 
@@ -435,37 +368,6 @@ export default function EventTicketSelectionPage() {
 
   return (
     <MainPageFrame header={<MainHeader />}>
-      <Modal
-        open={isExpiredModalOpen}
-        closable={false}
-        mask={{ closable: false }}
-        keyboard={false}
-        footer={null}
-        centered
-        width={560}
-      >
-        <div className="px-2 py-2 text-center">
-          <Typography.Title
-            level={3}
-            className="mb-3 text-[28px] font-extrabold"
-          >
-            Phiên đặt vé đã hết hạn
-          </Typography.Title>
-          <Typography.Paragraph className="mb-6 text-base leading-7 text-slate-500">
-            Phiên đặt vé chỉ được giữ trong vòng 5 phút. Vui lòng đặt lại vé để
-            tiếp tục.
-          </Typography.Paragraph>
-          <Button
-            type="primary"
-            size="large"
-            className="h-12 min-w-36 rounded-2xl"
-            onClick={handleConfirmLeave}
-          >
-            OK
-          </Button>
-        </div>
-      </Modal>
-
       <Modal
         open={isRecipientModalOpen}
         forceRender
@@ -650,10 +552,6 @@ export default function EventTicketSelectionPage() {
                 >
                   {"<- Quay lại"}
                 </Button>
-                <Tag className="m-0 rounded-full border-0 bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-600">
-                  Thời gian đặt vé còn lại{" "}
-                  {dinhDangDemNguoc(remainingMilliseconds)}
-                </Tag>
                 <Tag
                   className={`m-0 rounded-full border-0 px-4 py-2 text-sm font-bold ${
                     isRealtimeConnected
@@ -732,9 +630,7 @@ export default function EventTicketSelectionPage() {
                               value={displayedQuantity}
                               onDecrease={() => handleDecrease(ticketType)}
                               onIncrease={() => handleIncrease(ticketType)}
-                              disabled={
-                                isSubmitting || isSelectionExpired || isSoldOut
-                              }
+                              disabled={isSubmitting || isSoldOut}
                             />
                           </div>
                         </div>
@@ -779,9 +675,7 @@ export default function EventTicketSelectionPage() {
                   block
                   className="mt-6 h-12 rounded-2xl"
                   loading={isSubmitting}
-                  disabled={
-                    !selectedTicketType || isSelectionExpired || quantity <= 0
-                  }
+                  disabled={!selectedTicketType || quantity <= 0}
                   onClick={handleOpenRecipientModal}
                 >
                   Tiếp tục

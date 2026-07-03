@@ -1,4 +1,8 @@
-import type { EventDetail, EventInventoryResponse } from "./events";
+import type {
+  EventDetail,
+  EventInventoryResponse,
+  EventSummary,
+} from "./events";
 
 export const INVENTORY_UPDATE_EVENT = "inventory-update";
 export const INVENTORY_HEARTBEAT_EVENT = "inventory-heartbeat";
@@ -33,5 +37,20 @@ export function mergeInventoryIntoEvent(
         soldQuantity: snapshot.soldQuantity,
       };
     }),
+  };
+}
+
+export function mergeInventoryIntoEventSummary(
+  currentEvent: EventSummary,
+  inventory: EventInventoryResponse,
+) {
+  if (currentEvent.id !== inventory.eventId) {
+    return currentEvent;
+  }
+
+  return {
+    ...currentEvent,
+    availableTickets: inventory.totals.availableQuantity,
+    totalTickets: inventory.totals.totalQuantity,
   };
 }
