@@ -35,65 +35,6 @@ type PaymentReservationRecord = Prisma.ReservationGetPayload<{
 
 type PaymentTransactionClient = Prisma.TransactionClient;
 
-type InventorySyncResult =
-  { inventoryEventId?: undefined } | { inventoryEventId: string };
-
-type CreateSandboxPaymentResult = InventorySyncResult & {
-  payment: {
-    id: string;
-    reservationId: string;
-    status: PaymentStatus;
-    provider: PaymentProvider;
-    amount: number;
-    createdAt: string;
-    updatedAt: string;
-    paidAt: string | null;
-  } | null;
-};
-
-type ConfirmSandboxPaymentResult = InventorySyncResult & {
-  payment: {
-    id: string;
-    reservationId: string;
-    status: PaymentStatus;
-    provider: PaymentProvider;
-    amount: number;
-    createdAt: string;
-    updatedAt: string;
-    paidAt: string | null;
-  } | null;
-  reservation: {
-    id: string;
-    status: ReservationStatus;
-    expiresAt: string;
-  };
-  order: {
-    id: string;
-    code: string;
-    totalAmount: number;
-    createdAt: string;
-  } | null;
-  alreadyProcessed: boolean;
-};
-
-type FailSandboxPaymentResult = InventorySyncResult & {
-  payment: {
-    id: string;
-    reservationId: string;
-    status: PaymentStatus;
-    provider: PaymentProvider;
-    amount: number;
-    createdAt: string;
-    updatedAt: string;
-    paidAt: string | null;
-  } | null;
-  reservation: {
-    id: string;
-    status: ReservationStatus;
-    expiresAt: string;
-  };
-};
-
 @Injectable()
 export class PaymentsService {
   constructor(

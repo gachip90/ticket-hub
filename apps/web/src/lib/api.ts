@@ -173,3 +173,7 @@ export function subscribeAuthStore(onStoreChange: () => void) {
     window.removeEventListener(AUTH_STORE_EVENT, handler);
   };
 }
+
+export function getApiBaseUrl() {
+  return apiBaseUrl;
+}

@@ -149,7 +149,7 @@ export function MainHeader({
                 >
                   <Avatar
                     size={34}
-                    className="bg-slate-950 text-sm font-bold text-white cursor-pointer"
+                    className="cursor-pointer bg-slate-950 text-sm font-bold text-white"
                   >
                     {kyTuDaiDien}
                   </Avatar>

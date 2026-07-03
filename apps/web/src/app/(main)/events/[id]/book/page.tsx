@@ -12,39 +12,8 @@ import type {
   EventInventoryResponse,
 } from "../../../../../lib/events";
 import { dinhDangNgayGioDayDu, dinhDangTien } from "../../../../../lib/format";
-
-function mergeInventoryIntoEvent(
-  currentEvent: EventDetail,
-  inventory: EventInventoryResponse,
-) {
-  const inventoryByTicketTypeId = new Map(
-    inventory.ticketTypes.map((ticketType) => [
-      ticketType.ticketTypeId,
-      ticketType,
-    ]),
-  );
-
-  return {
-    ...currentEvent,
-    availableTickets: inventory.totals.availableQuantity,
-    totalTickets: inventory.totals.totalQuantity,
-    ticketTypes: currentEvent.ticketTypes.map((ticketType) => {
-      const snapshot = inventoryByTicketTypeId.get(ticketType.id);
-
-      if (!snapshot) {
-        return ticketType;
-      }
-
-      return {
-        ...ticketType,
-        totalQuantity: snapshot.totalQuantity,
-        availableQuantity: snapshot.availableQuantity,
-        heldQuantity: snapshot.heldQuantity,
-        soldQuantity: snapshot.soldQuantity,
-      };
-    }),
-  };
-}
+import { mergeInventoryIntoEvent } from "../../../../../lib/inventory";
+import { subscribeEventInventoryStream } from "../../../../../lib/inventory-stream";
 
 export default function EventBookPage() {
   const params = useParams<{ id: string }>();
@@ -52,6 +21,7 @@ export default function EventBookPage() {
   const [event, setEvent] = useState<EventDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isRealtimeConnected, setIsRealtimeConnected] = useState(false);
 
   useEffect(() => {
     const user = getStoredAuthUser();
@@ -85,7 +55,7 @@ export default function EventBookPage() {
   }, [params.id, router]);
 
   useEffect(() => {
-    if (!event) {
+    if (!params.id) {
       return;
     }
 
@@ -121,7 +91,27 @@ export default function EventBookPage() {
       isCancelled = true;
       window.clearInterval(timer);
     };
-  }, [event, params.id]);
+  }, [params.id]);
+
+  useEffect(() => {
+    if (!params.id) {
+      return;
+    }
+
+    return subscribeEventInventoryStream({
+      eventId: params.id,
+      onInventory: (inventory) => {
+        setEvent((currentEvent) => {
+          if (!currentEvent) {
+            return currentEvent;
+          }
+
+          return mergeInventoryIntoEvent(currentEvent, inventory);
+        });
+      },
+      onConnectionChange: setIsRealtimeConnected,
+    });
+  }, [params.id]);
 
   return (
     <MainPageFrame header={<MainHeader />}>
@@ -198,9 +188,19 @@ export default function EventBookPage() {
               Các hạng vé
             </Typography.Title>
             <Typography.Paragraph className="mb-6 text-sm leading-6 text-slate-500">
-              Bạn có thể xem tình trạng vé mới nhất trước khi chuyển sang màn
-              hình chọn vé và thanh toán.
+              Bạn có thể xem tình trạng vé mới nhất trước khi chuyển sang màn hình
+              chọn vé và thanh toán.
             </Typography.Paragraph>
+
+            <Tag
+              className={`mb-6 rounded-full border-0 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] ${
+                isRealtimeConnected
+                  ? "bg-emerald-50 text-emerald-600"
+                  : "bg-amber-50 text-amber-600"
+              }`}
+            >
+              {isRealtimeConnected ? "Realtime connected" : "Polling fallback"}
+            </Tag>
 
             <div className="space-y-4">
               {event.ticketTypes.map((ticketType) => (
@@ -217,7 +217,7 @@ export default function EventBookPage() {
                         {ticketType.name}
                       </Typography.Title>
                       <Typography.Text className="text-sm text-slate-500">
-                        Tổng: {ticketType.totalQuantity} vé
+                        {`Tổng: ${ticketType.totalQuantity} vé`}
                       </Typography.Text>
                     </div>
                     <Typography.Text className="text-lg font-extrabold text-slate-950">
@@ -226,9 +226,9 @@ export default function EventBookPage() {
                   </div>
 
                   <div className="grid gap-2 text-sm font-semibold text-slate-600 sm:grid-cols-3">
-                    <span>Còn {ticketType.availableQuantity} vé</span>
-                    <span>Đang giữ {ticketType.heldQuantity} vé</span>
-                    <span>Đã bán {ticketType.soldQuantity} vé</span>
+                    <span>{`Còn ${ticketType.availableQuantity} vé`}</span>
+                    <span>{`Đang giữ ${ticketType.heldQuantity} vé`}</span>
+                    <span>{`Đã bán ${ticketType.soldQuantity} vé`}</span>
                   </div>
                 </div>
               ))}

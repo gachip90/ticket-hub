@@ -1,5 +1,14 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  MessageEvent,
+  Param,
+  Query,
+  Sse,
+} from '@nestjs/common';
+import { Observable } from 'rxjs';
 import { InventoryService } from '../reservations/inventory.service';
+import { InventoryUpdatesService } from '../reservations/inventory-updates.service';
 import { EventsService } from './events.service';
 
 @Controller('api/events')
@@ -7,6 +16,7 @@ export class EventsController {
   constructor(
     private readonly eventsService: EventsService,
     private readonly inventoryService: InventoryService,
+    private readonly inventoryUpdatesService: InventoryUpdatesService,
   ) {}
 
   @Get()
@@ -22,6 +32,16 @@ export class EventsController {
   @Get(':id/inventory')
   getInventory(@Param('id') id: string) {
     return this.inventoryService.getEventInventory(id);
+  }
+
+  @Sse('inventory/stream')
+  streamAllInventory(): Observable<MessageEvent> {
+    return this.inventoryUpdatesService.streamAllInventory();
+  }
+
+  @Sse(':id/inventory/stream')
+  streamInventory(@Param('id') id: string): Observable<MessageEvent> {
+    return this.inventoryUpdatesService.streamEventInventory(id);
   }
 
   @Get(':id')

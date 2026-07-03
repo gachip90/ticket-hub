@@ -11,12 +11,14 @@ import type {
   EventInventoryResponse,
   EventTicketType,
 } from "../../../../../../lib/events";
-import type { ReservationDetail } from "../../../../../../lib/reservations";
 import {
   dinhDangDemNguoc,
   dinhDangNgayGioDayDu,
   dinhDangTien,
 } from "../../../../../../lib/format";
+import { mergeInventoryIntoEvent } from "../../../../../../lib/inventory";
+import { subscribeEventInventoryStream } from "../../../../../../lib/inventory-stream";
+import type { ReservationDetail } from "../../../../../../lib/reservations";
 
 const SELECTION_SESSION_DURATION_MS = 5 * 60 * 1000;
 
@@ -25,39 +27,6 @@ type RecipientFormValues = {
   recipientEmail: string;
   recipientPhone: string;
 };
-
-function mergeInventoryIntoEvent(
-  currentEvent: EventDetail,
-  inventory: EventInventoryResponse,
-) {
-  const inventoryByTicketTypeId = new Map(
-    inventory.ticketTypes.map((ticketType) => [
-      ticketType.ticketTypeId,
-      ticketType,
-    ]),
-  );
-
-  return {
-    ...currentEvent,
-    availableTickets: inventory.totals.availableQuantity,
-    totalTickets: inventory.totals.totalQuantity,
-    ticketTypes: currentEvent.ticketTypes.map((ticketType) => {
-      const snapshot = inventoryByTicketTypeId.get(ticketType.id);
-
-      if (!snapshot) {
-        return ticketType;
-      }
-
-      return {
-        ...ticketType,
-        totalQuantity: snapshot.totalQuantity,
-        availableQuantity: snapshot.availableQuantity,
-        heldQuantity: snapshot.heldQuantity,
-        soldQuantity: snapshot.soldQuantity,
-      };
-    }),
-  };
-}
 
 function SeatMapIllustration() {
   const blocks = [
@@ -121,7 +90,7 @@ function SeatMapIllustration() {
             Sơ đồ khu vực chỗ ngồi
           </p>
           <p className="mt-2 text-sm leading-7 text-slate-300">
-            Minh hoạ này giúp người dùng hình dung bố cục sân khấu và các vùng
+            Minh họa này giúp người dùng hình dung bố cục sân khấu và các vùng
             vé.
           </p>
         </div>
@@ -184,6 +153,7 @@ export default function EventTicketSelectionPage() {
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const [isRecipientModalOpen, setIsRecipientModalOpen] = useState(false);
   const [isExpiredModalOpen, setIsExpiredModalOpen] = useState(false);
+  const [isRealtimeConnected, setIsRealtimeConnected] = useState(false);
 
   useEffect(() => {
     const syncTimer = window.setTimeout(() => {
@@ -246,7 +216,7 @@ export default function EventTicketSelectionPage() {
   }, [params.id, recipientForm, router]);
 
   useEffect(() => {
-    if (!event) {
+    if (!params.id) {
       return;
     }
 
@@ -282,7 +252,27 @@ export default function EventTicketSelectionPage() {
       isCancelled = true;
       window.clearInterval(timer);
     };
-  }, [event, params.id]);
+  }, [params.id]);
+
+  useEffect(() => {
+    if (!params.id) {
+      return;
+    }
+
+    return subscribeEventInventoryStream({
+      eventId: params.id,
+      onInventory: (inventory) => {
+        setEvent((currentEvent) => {
+          if (!currentEvent) {
+            return currentEvent;
+          }
+
+          return mergeInventoryIntoEvent(currentEvent, inventory);
+        });
+      },
+      onConnectionChange: setIsRealtimeConnected,
+    });
+  }, [params.id]);
 
   const remainingMilliseconds = useMemo(() => {
     if (!selectionStartedAt) {
@@ -365,12 +355,16 @@ export default function EventTicketSelectionPage() {
 
   function handleOpenRecipientModal() {
     if (!selectedTicketType || !event) {
-      setError("Bạn cần chọn một hạng vé trước khi tiếp tục.");
+      setError(
+        "Bạn cần chọn một hạng vé trước khi tiếp tục.",
+      );
       return;
     }
 
     if (isSelectionExpired) {
-      setError("Phiên chọn vé đã hết hạn. Vui lòng tải lại trang.");
+      setError(
+        "Phiên chọn vé đã hết hạn. Vui lòng tải lại trang.",
+      );
       return;
     }
 
@@ -393,12 +387,16 @@ export default function EventTicketSelectionPage() {
 
   async function handleReserveTickets(values: RecipientFormValues) {
     if (!selectedTicketType || !event) {
-      setError("Bạn cần chọn một hạng vé trước khi tiếp tục.");
+      setError(
+        "Bạn cần chọn một hạng vé trước khi tiếp tục.",
+      );
       return;
     }
 
     if (isSelectionExpired) {
-      setError("Phiên chọn vé đã hết hạn. Vui lòng tải lại trang.");
+      setError(
+        "Phiên chọn vé đã hết hạn. Vui lòng tải lại trang.",
+      );
       return;
     }
 
@@ -650,11 +648,22 @@ export default function EventTicketSelectionPage() {
                   className="h-10 rounded-full px-3 text-slate-500"
                   onClick={handleBackClick}
                 >
-                  {"<-"} Quay lại
+                  {"<- Quay lại"}
                 </Button>
                 <Tag className="m-0 rounded-full border-0 bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-600">
                   Thời gian đặt vé còn lại{" "}
                   {dinhDangDemNguoc(remainingMilliseconds)}
+                </Tag>
+                <Tag
+                  className={`m-0 rounded-full border-0 px-4 py-2 text-sm font-bold ${
+                    isRealtimeConnected
+                      ? "bg-sky-50 text-sky-600"
+                      : "bg-amber-50 text-amber-600"
+                  }`}
+                >
+                  {isRealtimeConnected
+                    ? "Đang đồng bộ realtime"
+                    : "Đang dùng polling dự phòng"}
                 </Tag>
               </div>
 

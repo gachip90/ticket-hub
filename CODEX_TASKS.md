@@ -79,11 +79,11 @@ Use this checklist as the execution order for Codex.
 
 ## Phase 6 - Realtime
 
-- [ ] Implement WebSocket or SSE from backend.
-- [ ] Publish inventory updates after hold/release/payment.
-- [ ] Subscribe in event page.
+- [x] Implement WebSocket or SSE from backend.
+- [x] Publish inventory updates after hold/release/payment.
+- [x] Subscribe in event page.
 - [ ] Subscribe in admin dashboard.
-- [ ] Add reconnect or fallback behavior.
+- [x] Add reconnect or fallback behavior.
 
 ## Phase 7 - Admin dashboard
 
